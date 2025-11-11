@@ -1,0 +1,167 @@
+@use '../../../styles/cor_modelo.scss' as *;
+
+// Container principal com o fundo roxo claro
+.funcionario-form-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: $roxo-claro-background;
+}
+
+// Cabeçalho
+.header {
+  display: flex;
+  // Botão Voltar removido, ajustando alinhamento
+  justify-content: space-between; 
+  align-items: center;
+  padding: 16px 32px;
+  background-color: #fff;
+  border-bottom: 2px solid #eee;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+
+  .logo {
+    height: 40px;
+  }
+
+  h1 {
+    color: $azul-escuro-roxo;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    // Centraliza o H1 se não houver botão
+    flex-grow: 1;
+    text-align: center;
+    padding-left: 40px; // Compensa a logo
+  }
+}
+
+// Botão 'Voltar' no cabeçalho
+.btn-voltar {
+  padding: 10px 20px;
+  background-color: $azul-medio;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
+
+// Conteúdo principal (onde fica o formulário)
+.main-content {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 40px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+}
+
+// Estilos do formulário
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// Agrupador de (label + input)
+.form-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1; // Para 'form-row'
+  gap: 8px;
+
+  label {
+    font-weight: 600;
+    color: $azul-escuro-roxo;
+    font-size: 14px;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background: #fcfaff;
+    transition: all 0.2s ease;
+    box-sizing: border-box; 
+
+    &:focus {
+      border-color: $azul-medio;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba($azul-claro-ciano, 0.3);
+      background: #fff;
+    }
+
+    &:read-only,
+    &:disabled {
+      background-color: #eee;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Linha para colocar campos lado a lado
+.form-row {
+  display: flex;
+  flex-wrap: wrap; 
+  gap: 24px;
+}
+
+// Botões de Salvar e Cancelar
+.form-actions {
+  display: flex;
+  justify-content: flex-end; // Alinha o 'Salvar' à direita
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+
+  button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 14px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
+  .btn-salvar {
+    background-color: $verde-principal;
+    color: $azul-escuro-roxo;
+  }
+
+  // Botão 'Cancelar' REMOVIDO
+  // .btn-cancelar { ... }
+}
+
+// Mensagem de erro de validação
+.error-message {
+  color: #dc3545; // Vermelho
+  font-size: 13px;
+  font-weight: 500;
+  min-height: 14px; // Evita que o layout "pule"
+}

@@ -1,0 +1,255 @@
+@use '../../../styles/cor_modelo.scss' as *;
+
+// Container principal
+.lancamento-container {
+  width: 100%;
+  min-height: 100vh;
+  background-color: $roxo-claro-background;
+}
+
+// Cabeçalho (similar aos outros)
+.header {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  padding: 16px 32px;
+  background-color: #fff;
+  border-bottom: 2px solid #eee;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+
+  .logo {
+    height: 40px;
+  }
+
+  h1 {
+    color: $azul-escuro-roxo;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+    padding-left: 40px; 
+  }
+}
+
+// Conteúdo principal
+.main-content {
+  max-width: 1200px; // Um pouco maior para caber a tabela
+  margin: 40px auto;
+  padding: 0; // Padding será dado pelas seções
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+  overflow: hidden; // Para conter os elementos
+}
+
+// Seções do formulário (Cabeçalho, Add Item, Tabela)
+.form-section {
+  padding: 32px 40px;
+  border-bottom: 1px solid #eee;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: $azul-escuro-roxo;
+  margin: 0 0 24px 0;
+  border-bottom: 2px solid $roxo-claro-background;
+  padding-bottom: 12px;
+}
+
+// Linha de formulário
+.form-row {
+  display: flex;
+  flex-wrap: wrap; 
+  gap: 24px;
+}
+
+// Grupo de formulário (Label + Input)
+.form-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1; // Ocupa espaço igualmente
+  gap: 8px;
+  min-width: 250px; // Evita que fiquem muito pequenos
+
+  label {
+    font-weight: 600;
+    color: $azul-escuro-roxo;
+    font-size: 14px;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background: #fcfaff;
+    transition: all 0.2s ease;
+    box-sizing: border-box; 
+
+    &:focus {
+      border-color: $azul-medio;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba($azul-claro-ciano, 0.3);
+      background: #fff;
+    }
+  }
+}
+
+// Layout específico para Adicionar Item
+.add-item-row {
+  align-items: flex-end; // Alinha os campos e o botão
+
+  .fg-produto {
+    flex: 3; // Produto ocupa mais espaço
+    min-width: 300px;
+  }
+  .fg-quantidade {
+    flex: 1;
+    min-width: 100px;
+  }
+  .fg-botao {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+// Mensagem de "carrinho vazio"
+.status-message {
+  text-align: center;
+  padding: 32px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #555;
+  background: $roxo-claro-background;
+  border-radius: 4px;
+}
+
+// Tabela de Itens (Carrinho)
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+.itens-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    background-color: $roxo-claro-background;
+    color: $azul-escuro-roxo;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 14px;
+  }
+
+  td {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 15px;
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+// Botões
+.btn-adicionar {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  background-color: $azul-medio;
+  color: white;
+  transition: all 0.2s ease;
+
+  &:hover { filter: brightness(1.1); }
+  &:disabled { background-color: #aaa; cursor: not-allowed; }
+}
+
+.btn-remover {
+  background-color: #dc3545; // Vermelho
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover { filter: brightness(1.1); }
+}
+
+// Rodapé (Total e Ação Final)
+.form-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 32px 40px;
+  background-color: $roxo-claro-background;
+}
+
+.resumo-total {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  span {
+    font-size: 16px;
+    font-weight: 600;
+    color: $azul-escuro-roxo;
+  }
+
+  .total-valor {
+    font-size: 32px;
+    font-weight: 700;
+    color: $verde-principal;
+  }
+}
+
+.form-actions {
+  .btn-salvar {
+    padding: 16px 32px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 16px;
+    background-color: $verde-principal;
+    color: $azul-escuro-roxo;
+    transition: all 0.2s ease;
+
+    &:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+// Mensagem de erro
+.error-message {
+  color: #dc3545;
+  font-size: 13px;
+  font-weight: 500;
+  min-height: 14px; 
+}

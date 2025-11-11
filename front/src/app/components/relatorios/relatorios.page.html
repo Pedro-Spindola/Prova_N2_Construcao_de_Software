@@ -1,0 +1,108 @@
+<app-nav-bar/>
+
+<section>
+  <div class="container">
+    <h1>Relatório de Pedidos</h1>
+    <div class="box-tabela">
+
+      <form class="filtro-form" [formGroup]="filtroForm" (ngSubmit)="filtrar()">
+        <div class="filtro-campos">
+          
+          <label>
+            Funcionário:
+            <input type="text" formControlName="funcionario" placeholder="Nome do funcionário" />
+          </label>
+
+          <label>
+            Cliente:
+            <input type="text" formControlName="cliente" placeholder="Nome do cliente" />
+          </label>
+
+          <label>
+            Data Início:
+            <input type="date" formControlName="dataInicio" />
+          </label>
+
+          <label>
+            Data Fim:
+            <input type="date" formControlName="dataFim" />
+          </label>
+
+          <div class="filtro-botoes">
+            <button type="submit" class="btn btn-success">Filtrar</button>
+            <button type="button" class="btn btn-secondary" (click)="limparFiltros()">Limpar</button>
+          </div>
+        </div>
+      </form>
+
+      <div *ngIf="isLoading" class="status-message">
+        Carregando relatório...
+      </div>
+      <div *ngIf="!isLoading && pedidos.length === 0" class="status-message">
+        Nenhum pedido encontrado para os filtros selecionados.
+      </div>
+
+      <section *ngIf="!isLoading && pedidos.length > 0" class="table-container">
+        <table class="tabela-relatorio">
+          <thead>
+            <tr>
+              <th class="col-toggle"></th> 
+              <th>ID Pedido</th>
+              <th>Funcionário</th>
+              <th>Cliente</th>
+              <th>Data Pedido</th>
+              <th>Valor Total</th>
+            </tr>
+          </thead>
+          
+          <tbody *ngFor="let pedido of pedidos" class="pedido-group">
+
+            <tr class="pedido-row" (click)="toggleSubitens(pedido.id)">
+              <td class="col-toggle">
+                <span class="toggle-icon">
+                  {{ expandedPedidoId === pedido.id ? '−' : '+' }}
+                </span>
+              </td>
+              <td>{{ pedido.id }}</td>
+              <td>{{ pedido.funcionario }}</td>
+              <td>{{ pedido.cliente }}</td>
+              <td>{{ pedido.data | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ pedido.valorTotal | currency: 'BRL' }}</td>
+            </tr>
+
+            <tr class="subitens-container-row" *ngIf="expandedPedidoId === pedido.id">
+              <td></td> 
+              <td [colSpan]="5" class="subitens-cell">
+                <div class="subitens-wrapper">
+                  <h4>Itens do Pedido #{{ pedido.id }}</h4>
+                  
+                  <table class="tabela-subitens">
+                    <thead>
+                      <tr>
+                        <th>ID Item</th>
+                        <th>Produto</th>
+                        <th>Quantidade</th>
+                        <th>Valor Uni.</th>
+                        <th>Valor Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of pedido.item">
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.nomeProduto }}</td>
+                        <td>{{ item.quantidade }}</td>
+                        <td>{{ item.valorUnitario | currency: 'BRL' }}</td>
+                        <td>{{ item.valorTotal | currency: 'BRL' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+    </div>
+  </div>
+</section>
