@@ -1,0 +1,97 @@
+@use '../../../styles/cor_modelo.scss' as *;
+
+.navbar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: $roxo-claro-background;
+  color: black;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+  .navbar-top {
+    display: flex;
+    height: 70px;
+    padding: 10px 20px;
+    justify-content: space-between;
+    align-items: center;
+    background-color: $roxo-claro-background;
+  }
+
+  .navbar-logo img {
+    height: 30px;
+    cursor: pointer;
+  }
+
+  .navbar-user {
+    display: flex;
+    align-items: center;
+    background-color: $roxo-claro-background;
+    gap: 12px;
+
+    .user-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .user-name {
+      font-weight: 500;
+      font-size: 16px;
+    }
+
+    .logout-btn {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 22px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+
+      &:hover {
+        background-color: #dc2626;
+      }
+    }
+  }
+
+  .navbar-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: $azul-escuro-roxo;
+    height: 50px;
+    padding: 0px 20px;
+
+    .navbar-links {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      gap: 28px;
+
+      li {
+        a {
+          text-decoration: none;
+          color: $roxo-claro-background;
+          font-size: 15px;
+          font-weight: 500;
+          letter-spacing: 1px;
+          transition: color 0.2s;
+
+          &:hover {
+            color: $azul-claro-ciano;
+          }
+        }
+      }
+    }
+
+    h3{
+      color: $roxo-claro-background;
+      letter-spacing: 2px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+  }
+}
