@@ -17,6 +17,7 @@ export const routes: Routes = [
     { path: 'gerenciarProduto', component: GerenciarProdutoPage},
     { path: 'cliente', component: ClientePage},
     { path: 'gerenciarCliente', component: GerenciarClientePage},
+    { path: 'gerenciarCliente/:id', component: GerenciarClientePage},
     { path: 'funcionario', component: FuncionarioPage},
     { path: 'gerenciarFuncionario', component: GerenciarFuncionarioPage},
     { path: 'relatorios', component: RelatoriosPage},

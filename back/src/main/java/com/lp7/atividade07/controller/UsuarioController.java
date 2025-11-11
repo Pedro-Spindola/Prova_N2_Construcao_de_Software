@@ -49,14 +49,10 @@ public class UsuarioController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
         try {
-            // Tenta autenticar
             UsuarioResponseDTO response = usuarioService.autenticar(request);
-            // Se der certo, retorna 200 OK com o usuário no corpo
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            // Se a autenticação falhar (usuário/senha errados)
-            // Retorna 401 Unauthorized com a mensagem de erro
             return ResponseEntity.status(401).body(e.getMessage());
         }
     }

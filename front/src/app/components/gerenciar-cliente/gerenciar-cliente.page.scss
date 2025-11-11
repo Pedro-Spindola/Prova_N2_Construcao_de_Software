@@ -95,7 +95,7 @@ form {
     }
 
     // Estilo para campos desabilitados/readonly (como o ID)
-    &:read-only,
+
     &:disabled {
       background-color: #eee;
       cursor: not-allowed;
