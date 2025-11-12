@@ -17,7 +17,7 @@ export class PedidoService {
   }
 
   create(novoPedido: Pedido): Observable<Pedido> {
-    return this.http.post<Pedido>(this.apiUrl, novoPedido).pipe(catchError(this.handleError));
+    return this.http.post<Pedido>(`${this.apiUrl}/salvar`, novoPedido).pipe(catchError(this.handleError));
   }
 
   update(atualizarPedido: Pedido, id: number): Observable<Pedido> {

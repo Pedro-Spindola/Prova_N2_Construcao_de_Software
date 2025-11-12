@@ -25,7 +25,7 @@ export class ClienteService {
   }
 
   update(atualizarCliente: Cliente, id: number): Observable<Cliente> {
-    return this.http.put<Cliente>(`${this.apiUrl}/${id}`, atualizarCliente).pipe(catchError(this.handleError));
+    return this.http.put<Cliente>(`${this.apiUrl}/atualizar/${id}`, atualizarCliente).pipe(catchError(this.handleError));
   }
 
   obterClientes(): Cliente[]{

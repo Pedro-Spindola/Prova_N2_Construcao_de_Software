@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Item } from '../../model/Item';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Pedido } from '../../model/Pedido';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { NavBar } from "../nav-bar/nav-bar";
+import { PedidoService } from '../../services/pedido-service';
+import { PedidoDTO } from '../../model/PedidoDTO';
 
 @Component({
   selector: 'app-relatorios',
@@ -11,19 +13,23 @@ import { NavBar } from "../nav-bar/nav-bar";
   templateUrl: './relatorios.page.html',
   styleUrl: './relatorios.page.scss',
 })
-export class RelatoriosPage {
-  pedidos: Pedido[] = [];
+export class RelatoriosPage implements OnInit {
+  
+  // Lista Mestre (usando a nova interface PedidoDTO)
+  private pedidosTodos: PedidoDTO[] = [];
+  
+  // Lista de exibição
+  pedidos: PedidoDTO[] = [];
+  
   isLoading = false;
   filtroForm: FormGroup;
 
-  // Variável para controlar qual linha da tabela está expandida
   expandedPedidoId: number | null = null;
 
   constructor(
-    private fb: FormBuilder
-    // private relatorioService: RelatorioService // Injete seu serviço
+    private fb: FormBuilder,
+    private pedidoService: PedidoService // Injete o PedidoService real
   ) {
-    // Inicializa o formulário de filtro
     this.filtroForm = this.fb.group({
       funcionario: [''],
       cliente: [''],
@@ -37,60 +43,74 @@ export class RelatoriosPage {
   }
 
   /**
-   * Simula o carregamento dos dados do relatório.
+   * Carrega TODOS os pedidos da API (uma vez)
    */
   carregarRelatorio(): void {
     this.isLoading = true;
-    const filtros = this.filtroForm.value;
-    console.log('Buscando relatório com filtros:', filtros);
-
-    // --- SIMULAÇÃO DE API ---
-    setTimeout(() => {
-      // Dados de exemplo
-      const mockItens1: Item[] = [
-        { id: 'i1', quantidade: 2, nomeProduto: 'Produto A', valorUnitario: 50, valorTotal: 100 },
-        { id: 'i2', quantidade: 1, nomeProduto: 'Produto B', valorUnitario: 75, valorTotal: 75 }
-      ];
-      const mockItens2: Item[] = [
-        { id: 'i3', quantidade: 10, nomeProduto: 'Produto C (Caixa)', valorUnitario: 120, valorTotal: 1200 }
-      ];
-      
-      const mockPedidos: Pedido[] = [
-        {
-          id: 1001,
-          funcionario: 'Vendedor 1 (João)',
-          cliente: 'Cliente PF (Maria)',
-          data: '2025-11-05', // Formato ISO (YYYY-MM-DD)
-          valorTotal: 175,
-          item: mockItens1
-        },
-        {
-          id: 1002,
-          funcionario: 'Vendedor 2 (Ana)',
-          cliente: 'Empresa PJ (TechCorp)',
-          data: '2025-11-06',
-          valorTotal: 1200,
-          item: mockItens2
-        }
-      ];
-
-      // Aqui você aplicaria os filtros. Por enquanto, apenas retornamos os mocks.
-      this.pedidos = mockPedidos;
-      this.isLoading = false;
-    }, 1000); 
-    // --- FIM DA SIMULAÇÃO ---
+    
+    // O 'findAll' do seu service precisa retornar 'Observable<PedidoDTO[]>'
+    this.pedidoService.findAll().subscribe({
+      next: (dadosApi) => {
+        this.pedidosTodos = dadosApi as any; // (Usando 'as any' caso o service não esteja atualizado)
+        this.pedidos = this.pedidosTodos;
+        this.isLoading = false;
+        console.log('Pedidos carregados:', this.pedidos);
+      },
+      error: (erro) => {
+        console.error('Falha ao carregar pedidos.', erro);
+        this.isLoading = false;
+      }
+    });
   }
 
   /**
-   * Chamado ao clicar em "Filtrar".
+   * Filtra a lista mestre (pedidosTodos) no FRONTEND
+   * (Lógica de filtro CORRIGIDA para os DTOs)
    */
   filtrar(): void {
-    this.expandedPedidoId = null; // Fecha qualquer linha aberta ao filtrar
-    this.carregarRelatorio();
+    this.expandedPedidoId = null; 
+    const filtros = this.filtroForm.value;
+    
+    const funcFiltro = filtros.funcionario ? filtros.funcionario.toLowerCase() : null;
+    const cliFiltro = filtros.cliente ? filtros.cliente.toLowerCase() : null;
+    const dataInicioFiltro = filtros.dataInicio ? new Date(filtros.dataInicio + 'T00:00:00') : null;
+    const dataFimFiltro = filtros.dataFim ? new Date(filtros.dataFim + 'T23:59:59') : null;
+
+    let listaFiltrada = this.pedidosTodos;
+
+    // CORREÇÃO: Filtrando pelo nome dentro do objeto 'usuario'
+    if (funcFiltro) {
+      listaFiltrada = listaFiltrada.filter(p => 
+        p.usuario.nome.toLowerCase().includes(funcFiltro)
+      );
+    }
+
+    // CORREÇÃO: Filtrando pelo nome dentro do objeto 'cliente'
+    if (cliFiltro) {
+      listaFiltrada = listaFiltrada.filter(p => 
+        p.cliente.nome.toLowerCase().includes(cliFiltro)
+      );
+    }
+
+    // Filtro de Data Início
+    if (dataInicioFiltro) {
+      listaFiltrada = listaFiltrada.filter(p => 
+        new Date(p.data) >= dataInicioFiltro
+      );
+    }
+
+    // Filtro de Data Fim
+    if (dataFimFiltro) {
+      listaFiltrada = listaFiltrada.filter(p => 
+        new Date(p.data) <= dataFimFiltro
+      );
+    }
+
+    this.pedidos = listaFiltrada;
   }
 
   /**
-   * Chamado ao clicar em "Limpar".
+   * Limpa os filtros e restaura a lista completa.
    */
   limparFiltros(): void {
     this.filtroForm.reset({
@@ -100,19 +120,17 @@ export class RelatoriosPage {
       dataFim: null
     });
     this.expandedPedidoId = null;
-    this.carregarRelatorio();
+    this.pedidos = this.pedidosTodos;
   }
 
   /**
    * Controla a expansão da linha da tabela.
-   * Se a linha clicada já estiver aberta, ela fecha (id = null).
-   * Se outra linha estiver aberta, ela fecha e abre a nova.
    */
   toggleSubitens(pedidoId: number): void {
     if (this.expandedPedidoId === pedidoId) {
-      this.expandedPedidoId = null; // Fecha a linha
+      this.expandedPedidoId = null;
     } else {
-      this.expandedPedidoId = pedidoId; // Abre a nova linha
+      this.expandedPedidoId = pedidoId;
     }
   }
 }

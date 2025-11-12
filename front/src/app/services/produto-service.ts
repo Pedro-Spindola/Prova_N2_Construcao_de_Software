@@ -16,6 +16,10 @@ export class ProdutoService {
     return this.http.get<Produto[]>(this.apiUrl).pipe(catchError(this.handleError));
   }
 
+  findById(id: number): Observable<Produto> {
+    return this.http.get<Produto>(`${this.apiUrl}/${id}`).pipe(catchError(this.handleError));
+  }
+
   create(novoProduto: Produto): Observable<Produto> {
     return this.http.post<Produto>(this.apiUrl, novoProduto).pipe(catchError(this.handleError));
   }

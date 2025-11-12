@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { PerfilUsuario } from '../../model/enums/PerfilUsuario';
 import { StatusUsuario } from '../../model/enums/StatusUsuario';
 import { NavBar } from "../../components/nav-bar/nav-bar";
+import { FuncionarioService } from '../../services/funcionario-service';
 
 @Component({
   selector: 'app-funcionario',
@@ -14,7 +15,8 @@ import { NavBar } from "../../components/nav-bar/nav-bar";
   styleUrl: './funcionario.page.scss',
 })
 export class FuncionarioPage {
-  funcionarios: Funcionario[] = [];
+  private funcionariosTodos: Funcionario[] = [];
+  funcionarioFiltrados: Funcionario[] = [];
   isLoading = false;
   filtroForm: FormGroup;
 
@@ -27,7 +29,8 @@ export class FuncionarioPage {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private funcionarioService: FuncionarioService
     // private funcionarioService: FuncionarioService // Injete seu serviço
   ) {
     // Inicializa o formulário de filtro
@@ -45,64 +48,75 @@ export class FuncionarioPage {
 
   carregarFuncionarios(): void {
     this.isLoading = true;
-    const filtros = this.filtroForm.value;
-    console.log('Buscando funcionários com filtros:', filtros);
+    
+    this.funcionarioService.findAll().subscribe({
+      next: (dadosApi) => {
+        this.funcionariosTodos = dadosApi; 
+        this.funcionarioFiltrados = dadosApi; 
+        this.funcionarioService.adicionarFuncionario(dadosApi);
+        console.log('Funcionario carregado com sucesso: ', this.funcionarioFiltrados);
 
-    // --- SIMULAÇÃO DE API ---
-    setTimeout(() => {
-      const mockFuncionarios: Funcionario[] = [
-        {
-          id: 1,
-          nome: 'Admin do Sistema',
-          email: 'admin@email.com',
-          senha: '', // Senha nunca deve vir do back-end
-          perfil: PerfilUsuario.ADMIN,
-          status: this.StatusUsuario.ATIVO
-        },
-        {
-          id: 2,
-          nome: 'Operador Exemplo',
-          email: 'operador@email.com',
-          senha: '',
-          perfil: PerfilUsuario.OPERADOR,
-          status: this.StatusUsuario.ATIVO
-        },
-        {
-          id: 3,
-          nome: 'Supervisor Inativo',
-          email: 'inativo@email.com',
-          senha: '',
-          perfil: PerfilUsuario.SUPERVISOR,
-          status: this.StatusUsuario.INATIVO
-        }
-      ];
-
-      // Simula o filtro
-      this.funcionarios = mockFuncionarios.filter(f => {
-        const filtroNome = !filtros.nome || f.nome.toLowerCase().includes(filtros.nome.toLowerCase());
-        const filtroEmail = !filtros.email || f.email.toLowerCase().includes(filtros.email.toLowerCase());
-        const filtroPerfil = !filtros.perfil || f.perfil === filtros.perfil;
-        const filtroStatus = !filtros.status || f.status === filtros.status;
-        return filtroNome && filtroEmail && filtroPerfil && filtroStatus;
-      });
-
-      this.isLoading = false;
-    }, 1000); 
-    // --- FIM DA SIMULAÇÃO ---
-  }
-
-  filtrar(): void {
-    this.carregarFuncionarios();
-  }
-
-  limparFiltros(): void {
-    this.filtroForm.reset({
-      nome: '',
-      email: '',
-      perfil: null,
-      status: null
+        this.isLoading = false; 
+      },
+      error: (erro) => {
+        console.error('Falha ao carregar a lista de funcionario.', erro);
+        this.isLoading = false; 
+      }
     });
-    this.carregarFuncionarios();
+  }
+
+  /**
+ * Filtra a lista de funcionários (no frontend) com base 
+ * nos campos do formulário.
+ */
+  filtrar(): void {
+    // 1. Pega os valores do formulário
+    const filtros = this.filtroForm.value;
+    
+    // 2. Começa com a lista mestre completa
+    let listaFiltrada = this.funcionariosTodos;
+
+    // 3. Aplica filtro de NOME (parcial, case-insensitive)
+    if (filtros.nome) {
+      const nomeFiltro = filtros.nome.toLowerCase();
+      listaFiltrada = listaFiltrada.filter(funcionario => 
+        funcionario.nome.toLowerCase().includes(nomeFiltro)
+      );
+    }
+
+    // 4. Aplica filtro de EMAIL (parcial, case-insensitive)
+    if (filtros.email) {
+      const emailFiltro = filtros.email.toLowerCase();
+      listaFiltrada = listaFiltrada.filter(funcionario => 
+        funcionario.email.toLowerCase().includes(emailFiltro)
+      );
+    }
+
+    // 5. Aplica filtro de PERFIL (exato)
+    if (filtros.perfil) {
+      listaFiltrada = listaFiltrada.filter(funcionario => 
+        funcionario.perfil === filtros.perfil
+      );
+    }
+
+    // 6. Aplica filtro de STATUS (exato)
+    if (filtros.status) {
+      listaFiltrada = listaFiltrada.filter(funcionario => 
+        funcionario.status === filtros.status
+      );
+    }
+
+    // 7. Atualiza a lista exibida na tela
+    this.funcionarioFiltrados = listaFiltrada;
+  }
+
+  /**
+   * Limpa os campos do formulário e restaura a lista
+   * para mostrar todos os funcionários (sem chamar a API).
+   */
+  limparFiltros(): void {
+    this.filtroForm.reset();
+    this.funcionarioFiltrados = this.funcionariosTodos;
   }
 
   novoFuncionario(): void {
@@ -110,6 +124,6 @@ export class FuncionarioPage {
   }
 
   editarFuncionario(id: number): void {
-    this.router.navigateByUrl('/gerenciarFuncionario');
+    this.router.navigateByUrl(`/gerenciarFuncionario/${id}`);
   }
 }

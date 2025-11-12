@@ -1,10 +1,11 @@
-import { Item } from "./Item";
+import { ItemCompraRequest } from "./ItemCompraRequest";
 
 export interface Pedido{
     id: number,
-    funcionario: string,
+    usuario: string,
     cliente: string,
-    data: string,
-    valorTotal: number,
-    item: Item[]
+    data?: string,
+    total: number,
+    troco: number,
+    itensComprados: ItemCompraRequest[]
 }

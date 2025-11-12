@@ -30,6 +30,21 @@
     text-align: center;
     padding-left: 40px; 
   }
+
+  .btn-voltar {
+    padding: 10px 20px;
+    background-color: $azul-medio;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+
+    &:hover {
+      filter: brightness(1.1);
+    }
+  }
 }
 
 // Conteúdo principal

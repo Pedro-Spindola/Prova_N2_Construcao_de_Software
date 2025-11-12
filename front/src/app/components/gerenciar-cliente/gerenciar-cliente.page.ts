@@ -145,11 +145,13 @@ export class GerenciarClientePage implements OnInit {
     const clienteData = this.clienteForm.getRawValue();
 
     if (this.isEditing) {
-      console.log('Salvando (Update):', clienteData);
-      // this.clienteService.update(this.clienteId, clienteData).subscribe(() => {
-      //   alert('Cliente atualizado com sucesso!');
-      //   this.voltar();
-      // });
+      if(this.clienteId != null){
+        console.log('Salvando (Update):', clienteData);
+        this.clienteService.update(clienteData, this.clienteId).subscribe(() => {
+          alert('Cliente atualizado com sucesso!');
+          this.voltar();
+        });
+      }
     } else {
       console.log('Salvando (Create):', clienteData);
       this.clienteService.create(clienteData).subscribe(() => {

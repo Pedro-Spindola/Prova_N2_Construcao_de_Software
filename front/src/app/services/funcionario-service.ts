@@ -7,21 +7,25 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root',
 })
 export class FuncionarioService {
-  private readonly apiUrl = 'http://localhost:8080/api/v1/funcionario'
+  private readonly apiUrl = 'http://localhost:8080/api/v1/usuario'
   private funcionarios: Funcionario[] = [];
 
   constructor(private http: HttpClient) {}
   
   findAll(): Observable<Funcionario[]>{
-    return this.http.get<Funcionario[]>(this.apiUrl).pipe(catchError(this.handleError));
+    return this.http.get<Funcionario[]>(`${this.apiUrl}/buscartodos`).pipe(catchError(this.handleError));
+  }
+
+  findById(id: number): Observable<Funcionario>{
+    return this.http.get<Funcionario>(`${this.apiUrl}/${id}`).pipe(catchError(this.handleError));
   }
 
   create(novoFuncionario: Funcionario): Observable<Funcionario> {
-    return this.http.post<Funcionario>(this.apiUrl, novoFuncionario).pipe(catchError(this.handleError));
+    return this.http.post<Funcionario>(`${this.apiUrl}/salvar`, novoFuncionario).pipe(catchError(this.handleError));
   }
 
   update(atualizarFuncionario: Funcionario, id: number): Observable<Funcionario> {
-    return this.http.put<Funcionario>(`${this.apiUrl}/${id}`, atualizarFuncionario).pipe(catchError(this.handleError));
+    return this.http.put<Funcionario>(`${this.apiUrl}/atualizar/${id}`, atualizarFuncionario).pipe(catchError(this.handleError));
   }
   
   obterFuncionario(): Funcionario[]{

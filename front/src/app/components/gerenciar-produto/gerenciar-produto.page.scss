@@ -92,13 +92,12 @@ form {
       box-shadow: 0 0 0 3px rgba($azul-claro-ciano, 0.3);
       background: #fff;
     }
-
-    // Estilo para campos desabilitados/readonly (como o ID)
-    &:read-only,
-    &:disabled {
-      background-color: #eee;
-      cursor: not-allowed;
-    }
+  }
+  
+  input:disabled {
+    background-color: #e7e6e6;
+    color: #888;
+    cursor: not-allowed;
   }
 }
 
