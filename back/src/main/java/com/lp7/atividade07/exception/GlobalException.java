@@ -50,4 +50,14 @@ public ResponseEntity<ErroResponse> handleClienteNaoEncontrado(ClienteNaoEncontr
 
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
 }
+
+@ExceptionHandler(PedidoNaoEncontradoException.class)
+public ResponseEntity<ErroResponse> handlePedidoNaoEncontrado(PedidoNaoEncontradoException ex) {
+    ErroResponse error = new ErroResponse(
+        HttpStatus.NOT_FOUND.value(),
+        ex.getMessage(),
+        LocalDateTime.now()
+    );
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+}
 }
