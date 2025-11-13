@@ -48,11 +48,11 @@
       <div *ngIf="isLoading" class="status-message">
         Carregando funcionários...
       </div>
-      <div *ngIf="!isLoading && funcionarios.length === 0" class="status-message">
+      <div *ngIf="!isLoading && funcionarioFiltrados.length === 0" class="status-message">
         Nenhum funcionário encontrado.
       </div>
 
-      <section *ngIf="!isLoading && funcionarios.length > 0" class="table-container">
+      <section *ngIf="!isLoading && funcionarioFiltrados.length > 0" class="table-container">
         <table class="tabela-funcionario">
           <thead>
             <tr>
@@ -65,7 +65,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let f of funcionarios">
+            <tr *ngFor="let f of funcionarioFiltrados">
               <td>{{ f.id }}</td>
               <td>{{ f.nome }}</td>
               <td>{{ f.email }}</td>

@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { StatusProduto } from '../../model/enums/StatusProduto';
 import { Produto } from '../../model/Produto';
 import { CommonModule } from '@angular/common';
+import { ProdutoService } from '../../services/produto-service';
 
 @Component({
   selector: 'app-gerenciar-produto',
-  imports: [RouterModule, ReactiveFormsModule, CommonModule],
+  imports: [RouterModule, ReactiveFormsModule, CommonModule, FormsModule],
   templateUrl: './gerenciar-produto.page.html',
   styleUrl: './gerenciar-produto.page.scss',
 })
@@ -17,99 +18,102 @@ export class GerenciarProdutoPage implements OnInit {
   isEditing = false;
   produtoId: number | null = null;
   
-  // Para o <select> de Status
   statusOptions = Object.values(StatusProduto);
 
   constructor(
     private fb: FormBuilder,
-    private route: ActivatedRoute, // Para ler o ID da URL
+    private route: ActivatedRoute,
     private router: Router,
-    // private produtoService: ProdutoService // Injete seu serviço
+    private produtoService: ProdutoService // <-- Injetado
   ) {
-    // Inicializa o formulário
     this.produtoForm = this.fb.group({
-      // O ID é desabilitado; ele só é preenchido no modo de edição
       id: [{ value: null, disabled: true }],
       nome: ['', Validators.required],
-      descricao: [''], // Descrição não é obrigatória no seu form
+      descricao: [''], 
       quantidadeCaixa: [null, [Validators.required, Validators.min(0)]],
+      // Assumindo que seu modelo 'Produto' inclui 'precoCusto'
       precoCusto: [null, [Validators.required, Validators.min(0)]],
       precoVenda: [null, [Validators.required, Validators.min(0)]],
-      // O status será 'ATIVO' ou 'INATIVO' (do Enum)
       status: [StatusProduto.ATIVO, Validators.required],
-      // Segui seu HTML, mas lembre-se que no back-end o Estoque é separado
-      quantidadeEmEstoque: [null, [Validators.required, Validators.min(0)]]
+      quantidadeEmEstoque: [{ value: null, disabled: true }, [Validators.required, Validators.min(0)]]
     });
   }
 
   ngOnInit(): void {
-    // Verifica se há um 'id' nos parâmetros da rota
     const idParam = this.route.snapshot.paramMap.get('id');
     
     if (idParam) {
       this.isEditing = true;
-      this.produtoId = +idParam; // Converte string 'id' para number
+      this.produtoId = +idParam;
       this.carregarProduto();
     }
   }
 
   /**
-   * (SIMULAÇÃO) Carrega os dados do produto da API.
-   * Substitua pela chamada real do seu serviço.
+   * Carrega os dados do produto da API (não mais simulado).
    */
   carregarProduto(): void {
+    if (!this.produtoId) return;
+
     console.log('Modo Edição: Carregando produto ID:', this.produtoId);
     
-    // --- Início da Simulação ---
-    // (Substitua pelo seu this.produtoService.getById(this.produtoId).subscribe(...))
-    const mockProduto: Produto = {
-      id: this.produtoId!,
-      nome: 'Produto (Carregado da API)',
-      descricao: 'Esta é uma descrição vinda da API.',
-      quantidadeCaixa: 12,
-      precoVenda: 199.90,
-      status: StatusProduto.INATIVO,
-      quantidadeEmEstoque: 50
-    };
-    
-    // Simula o 'precoCusto' (que não vem no seu 'Produto' interface)
-    const mockPrecoCusto = 120.00; 
-    
-    // Preenche o formulário com os dados carregados
-    this.produtoForm.patchValue({
-      ...mockProduto,
-      precoCusto: mockPrecoCusto 
+    this.produtoService.findById(this.produtoId).subscribe({
+      next: (produtoDaApi) => {
+        // Preenche o formulário com os dados carregados
+        this.produtoForm.patchValue(produtoDaApi);
+        console.log('Produto carregado:', produtoDaApi);
+      },
+      error: (erro) => {
+        console.error('Falha ao carregar produto.', erro);
+        alert('Erro ao carregar o produto. Voltando para a lista.');
+        this.voltar();
+      }
     });
-    // --- Fim da Simulação ---
   }
 
   /**
    * Chamado ao clicar em "Salvar".
+   * Agora chama o serviço de create ou update.
    */
   onSubmit(): void {
     if (this.produtoForm.invalid) {
       console.log('Formulário inválido');
-      this.produtoForm.markAllAsTouched(); // Mostra erros de validação
+      this.produtoForm.markAllAsTouched();
       return;
     }
 
     // Pega todos os valores, incluindo o 'id' desabilitado
-    const produtoData = this.produtoForm.getRawValue();
+    const produtoData = this.produtoForm.getRawValue() as Produto;
 
     if (this.isEditing) {
       console.log('Salvando (Update):', produtoData);
-      // Aqui você chamaria seu serviço de atualização
-      // this.produtoService.update(this.produtoId, produtoData).subscribe(() => {
-      //   alert('Produto atualizado com sucesso!');
-      //   this.voltar();
-      // });
+      
+      // Chama o serviço de atualização
+      this.produtoService.update(produtoData, this.produtoId!).subscribe({
+        next: () => {
+          alert('Produto atualizado com sucesso!');
+          this.voltar();
+        },
+        error: (erro) => {
+          console.error('Falha ao atualizar produto.', erro);
+          alert('Erro ao atualizar produto.');
+        }
+      });
+
     } else {
       console.log('Salvando (Create):', produtoData);
-      // Aqui você chamaria seu serviço de criação
-      // this.produtoService.create(produtoData).subscribe(() => {
-      //   alert('Produto criado com sucesso!');
-      //   this.voltar();
-      // });
+      
+      // Chama o serviço de criação
+      this.produtoService.create(produtoData).subscribe({
+        next: () => {
+          alert('Produto criado com sucesso!');
+          this.voltar();
+        },
+        error: (erro) => {
+          console.error('Falha ao criar produto.', erro);
+          alert('Erro ao criar produto.');
+        }
+      });
     }
   }
 

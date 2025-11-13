@@ -5,6 +5,7 @@ import { Cliente } from '../../model/Cliente';
 import { TipoCliente } from '../../model/enums/TipoCliente';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ClienteService } from '../../services/cliente-service';
 
 @Component({
   selector: 'app-gerenciar-cliente',
@@ -20,7 +21,7 @@ export class GerenciarClientePage implements OnInit {
   // Enums para o template
   statusOptions = Object.values(StatusCliente);
   tipoOptions = Object.values(TipoCliente);
-  TipoCliente = TipoCliente; // Para usar no *ngIf
+  TipoCliente = TipoCliente;
 
   // Propriedades dinâmicas para o campo 'documento'
   documentoLabel = 'CPF';
@@ -31,15 +32,15 @@ export class GerenciarClientePage implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute, // Para ler o ID da URL
     private router: Router,
-    // private clienteService: ClienteService // Injete seu serviço
+    private clienteService: ClienteService // Injete seu serviço
   ) {
-    // Inicializa o formulário
     this.clienteForm = this.fb.group({
       id: [{ value: null, disabled: true }],
+
       nome: ['', Validators.required],
       tipo: [TipoCliente.PF, Validators.required],
       documento: ['', [Validators.required, Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]], // Validação inicial de CPF
-      endereco: [''], // Opcional
+      endereco: ['', Validators.required], // Opcional
       status: [StatusCliente.ATIVO, Validators.required],
     });
   }
@@ -61,12 +62,13 @@ export class GerenciarClientePage implements OnInit {
     }
   }
 
-  /**
+  /*
    * Fica "escutando" o campo 'tipo' (PF/PJ) e chama a função
    * que atualiza a validação, máscara e label do campo 'documento'.
    */
   setupTipoClienteListener(): void {
     this.clienteForm.get('tipo')?.valueChanges.subscribe((tipo: TipoCliente) => {
+      this.clienteForm.get('documento')?.setValue('');
       this.atualizarCamposDocumento(tipo);
     });
   }
@@ -79,8 +81,6 @@ export class GerenciarClientePage implements OnInit {
     const documentoControl = this.clienteForm.get('documento');
     if (!documentoControl) return;
 
-    // Limpa o valor e os erros do campo
-    documentoControl.setValue('');
     documentoControl.clearValidators();
 
     if (tipo === this.TipoCliente.PF) {
@@ -106,31 +106,29 @@ export class GerenciarClientePage implements OnInit {
     documentoControl.updateValueAndValidity();
   }
 
-  /**
-   * (SIMULAÇÃO) Carrega os dados do cliente da API.
-   */
   carregarCliente(): void {
+    // 1. Verificação de segurança, caso o ID não exista
+    if (!this.clienteId) {
+      console.error('Modo Edição, mas nenhum ID foi fornecido.');
+      this.voltar();
+      return;
+    }
+
     console.log('Modo Edição: Carregando cliente ID:', this.clienteId);
-    
-    // --- Início da Simulação ---
-    // (Substitua pelo seu this.clienteService.getById(this.clienteId).subscribe(...))
-    const mockCliente: Cliente = {
-      id: this.clienteId!,
-      nome: 'Empresa (Carregada da API)',
-      tipo: this.TipoCliente.PJ,
-      documento: '11.222.333/0001-44',
-      endereco: 'Avenida Faria Lima, 1000',
-      status: StatusCliente.PEDENTE
-    };
-    
-    // Preenche o formulário com os dados carregados
-    this.clienteForm.patchValue(mockCliente);
-    
-    // IMPORTANTE:
-    // Chamar manualmente a função de atualização de campos após o patchValue
-    // para garantir que a máscara e validação corretas sejam aplicadas.
-    this.atualizarCamposDocumento(mockCliente.tipo);
-    // --- Fim da Simulação ---
+
+    // 2. Chama o serviço para buscar o cliente
+    this.clienteService.findById(this.clienteId).subscribe({
+      next: (dadosDoCliente) => {
+        console.log('Cliente carregado com sucesso: ', dadosDoCliente);
+        this.clienteForm.patchValue(dadosDoCliente);
+        this.atualizarCamposDocumento(dadosDoCliente.tipo);
+      },
+      error: (erro) => {
+        console.error('Falha ao carregar os dados do cliente.', erro);
+        alert('Erro ao carregar cliente. Tente novamente.');
+        this.voltar();
+      }
+    });
   }
 
   /**
@@ -147,17 +145,19 @@ export class GerenciarClientePage implements OnInit {
     const clienteData = this.clienteForm.getRawValue();
 
     if (this.isEditing) {
-      console.log('Salvando (Update):', clienteData);
-      // this.clienteService.update(this.clienteId, clienteData).subscribe(() => {
-      //   alert('Cliente atualizado com sucesso!');
-      //   this.voltar();
-      // });
+      if(this.clienteId != null){
+        console.log('Salvando (Update):', clienteData);
+        this.clienteService.update(clienteData, this.clienteId).subscribe(() => {
+          alert('Cliente atualizado com sucesso!');
+          this.voltar();
+        });
+      }
     } else {
       console.log('Salvando (Create):', clienteData);
-      // this.clienteService.create(clienteData).subscribe(() => {
-      //   alert('Cliente criado com sucesso!');
-      //   this.voltar();
-      // });
+      this.clienteService.create(clienteData).subscribe(() => {
+        alert('Cliente criado com sucesso!');
+        this.voltar();
+      });
     }
   }
 

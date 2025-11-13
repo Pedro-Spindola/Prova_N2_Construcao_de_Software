@@ -5,6 +5,7 @@ import { StatusUsuario } from '../../model/enums/StatusUsuario';
 import { Funcionario } from '../../model/Funcionario';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FuncionarioService } from '../../services/funcionario-service';
 
 @Component({
   selector: 'app-gerenciar-funcionario',
@@ -24,8 +25,8 @@ export class GerenciarFuncionarioPage {
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private router: Router
-    // private funcionarioService: FuncionarioService
+    private router: Router,
+    private funcionarioService: FuncionarioService
   ) {
     this.funcionarioForm = this.fb.group({
       id: [{ value: null, disabled: true }],
@@ -33,8 +34,7 @@ export class GerenciarFuncionarioPage {
       email: ['', [Validators.required, Validators.email]],
       perfil: [PerfilUsuario.ADMIN, Validators.required],
       status: [StatusUsuario.ATIVO, Validators.required],
-      // Campos de senha
-      senha: [''], // Validador será adicionado dinamicamente
+      senha: [''],
       confirmarSenha: ['']
     }, {
       // Validador customizado para garantir que as senhas são iguais
@@ -51,10 +51,9 @@ export class GerenciarFuncionarioPage {
       this.funcionarioId = +idParam;
       this.carregarFuncionario();
       
-      // Senha é opcional na edição
       this.funcionarioForm.get('senha')?.clearValidators();
       this.funcionarioForm.get('confirmarSenha')?.clearValidators();
-
+      
     } else {
       // MODO CRIAÇÃO
       this.isEditing = false;
@@ -73,21 +72,31 @@ export class GerenciarFuncionarioPage {
    * (SIMULAÇÃO) Carrega dados do funcionário.
    */
   carregarFuncionario(): void {
-    console.log('Modo Edição: Carregando funcionário ID:', this.funcionarioId);
-    
-    // --- Início da Simulação ---
-    const mockFuncionario: Funcionario = {
-      id: this.funcionarioId!,
-      nome: 'Usuário (Carregado da API)',
-      email: 'usuario@api.com',
-      senha: '', // NUNCA carregar a senha no form
-      perfil: PerfilUsuario.ADMIN,
-      status: StatusUsuario.ATIVO
-    };
-    
-    // Preenche o formulário (sem a senha)
-    this.funcionarioForm.patchValue(mockFuncionario);
-    // --- Fim da Simulação ---
+    // 1. Verificação de segurança, caso o ID não exista
+    if (!this.funcionarioId) {
+      console.error('Modo Edição, mas nenhum ID foi fornecido.');
+      this.voltar();
+      return;
+    }
+
+    console.log('Modo Edição: Carregando funcionario ID:', this.funcionarioId);
+
+    // 2. Chama o serviço para buscar o cliente
+    this.funcionarioService.findById(this.funcionarioId).subscribe({
+      next: (dadosDoCliente) => {
+        console.log('Funcionario carregado com sucesso: ', dadosDoCliente);
+        this.funcionarioForm.patchValue(dadosDoCliente);
+        const senhaRecebida = this.funcionarioForm.get('senha')?.value;
+        if (senhaRecebida) {
+          this.funcionarioForm.get('confirmarSenha')?.setValue(senhaRecebida);
+        }
+      },
+      error: (erro) => {
+        console.error('Falha ao carregar os dados do cunfionario.', erro);
+        alert('Erro ao carregar funcionario. Tente novamente.');
+        this.voltar();
+      }
+    });
   }
 
   /**
@@ -111,22 +120,24 @@ export class GerenciarFuncionarioPage {
     }
 
     if (this.isEditing) {
-      console.log('Salvando (Update):', formData);
-      // this.funcionarioService.update(this.funcionarioId, formData).subscribe(() => {
-      //   alert('Funcionário atualizado com sucesso!');
-      //   this.router.navigate(['/admin/funcionarios']); // Navega de volta
-      // });
+        if(this.funcionarioId != null){
+          console.log('Salvando (Update):', formData);
+          this.funcionarioService.update(formData, this.funcionarioId).subscribe(() => {
+            alert('Funcionário atualizado com sucesso!');
+            this.router.navigate(['funcionarios']); // Navega de volta
+          });
+        }
     } else {
       console.log('Salvando (Create):', formData);
-      // this.funcionarioService.create(formData).subscribe(() => {
-      //   alert('Funcionário criado com sucesso!');
-      //   this.router.navigate(['/admin/funcionarios']); // Navega de volta
-      // });
+        this.funcionarioService.create(formData).subscribe(() => {
+          alert('Funcionário criado com sucesso!');
+          this.router.navigate(['funcionarios']); // Navega de volta
+        });
     }
     
     // Simulação de navegação após salvar
     alert('Salvo com sucesso! (Simulação)');
-    this.router.navigate(['/admin/funcionarios']); // Rota da sua listagem
+    this.router.navigate(['funcionario']); // Rota da sua listagem
   }
 
   // Validador customizado

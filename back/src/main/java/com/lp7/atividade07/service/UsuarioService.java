@@ -133,8 +133,12 @@ public class UsuarioService {
     }
 
   public UsuarioResponseDTO autenticar(LoginRequestDTO request){
-    return usuarioMapper.toResponseDTO(usuarioRepository.findByEmail(request.email()).get());
-}
+    Usuario usuario = usuarioRepository.findByEmail(request.email())
+        .orElseThrow(() -> new CampoObrigatorioNuloException("Usuário não encontrado."));
+    if(!usuario.getSenha().equals(request.senha()))throw new CampoObrigatorioNuloException("Senha invalida.");
+    
+    return usuarioMapper.toResponseDTO(usuario); 
+    }
 }
     
 

@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NavBar } from "../../components/nav-bar/nav-bar";
 import { Produto } from '../../model/Produto';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { StatusProduto } from '../../model/enums/StatusProduto';
+import { ProdutoService } from '../../services/produto-service';
 
 @Component({
   selector: 'app-produto',
@@ -12,20 +13,25 @@ import { StatusProduto } from '../../model/enums/StatusProduto';
   templateUrl: './produto.page.html',
   styleUrl: './produto.page.scss',
 })
-export class ProdutoPage {
-  produtos: Produto[] = [];
+export class ProdutoPage implements OnInit {
+  // A "Lista Mestre" que guarda todos os produtos
+  private produtosTodos: Produto[] = []; 
+  
+  // A lista que o HTML exibe (que será filtrada)
+  produtos: Produto[] = []; 
+  
   isLoading = false;
   filtroForm: FormGroup;
   statusOptions = Object.values(StatusProduto);
-  statusProduto = StatusProduto;
+  statusProduto = StatusProduto; // Para usar no HTML
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private produtoService: ProdutoService // <-- Injetado
   ) {
-
     this.filtroForm = this.fb.group({
-      nome: [''],
+      nome: [null],
       status: [null]
     });
   }
@@ -34,89 +40,89 @@ export class ProdutoPage {
     this.carregarProdutos();
   }
 
+  /**
+   * Carrega TODOS os produtos da API, UMA VEZ.
+   */
   carregarProdutos(): void {
     this.isLoading = true;
-    const filtros = this.filtroForm.value;
-    console.log('Buscando produtos com filtros:', filtros);
 
-    // (Substitua isso pela chamada ao seu service)
-    setTimeout(() => {
-      const mockProdutos: Produto[] = [
-        {
-          id: 1,
-          nome: 'Produto A (Exemplo)',
-          descricao: 'Descrição do produto A',
-          quantidadeCaixa: 10,
-          precoVenda: 150.75,
-          status: this.statusProduto.ATIVO,
-          quantidadeEmEstoque: 100
-        },
-        {
-          id: 2,
-          nome: 'Produto B (Exemplo)',
-          descricao: 'Descrição do produto B',
-          quantidadeCaixa: 5,
-          precoVenda: 89.90,
-          status: this.statusProduto.INATIVO,
-          quantidadeEmEstoque: 0
-        },
-        {
-          id: 3,
-          nome: 'Produto C (Exemplo)',
-          descricao: 'Descrição do produto C',
-          quantidadeCaixa: 1,
-          precoVenda: 500.00,
-          status: this.statusProduto.ATIVO,
-          quantidadeEmEstoque: 25
-        },
-        {
-          id: 4,
-          nome: 'Produto D (Exemplo)',
-          descricao: 'Descrição do produto D',
-          quantidadeCaixa: 9,
-          precoVenda: 380.50,
-          status: this.statusProduto.ATIVO,
-          quantidadeEmEstoque: 12
-        },
-        {
-          id: 5,
-          nome: 'Produto E (Exemplo)',
-          descricao: 'Descrição do produto E',
-          quantidadeCaixa: 12,
-          precoVenda: 1250.40,
-          status: this.statusProduto.INATIVO,
-          quantidadeEmEstoque: 85
-        }
-      ];
-
-      this.produtos = mockProdutos.filter(p => {
-        const filtroNome = !filtros.nome || p.nome.toLowerCase().includes(filtros.nome.toLowerCase());
-        const filtroStatus = !filtros.status || p.status === filtros.status;
-        return filtroNome && filtroStatus;
-      });
-
-      this.isLoading = false;
-    }, 1000);
-    // --- FIM DA SIMULAÇÃO ---
+    // Chama o serviço (sem filtros) para pegar tudo
+    this.produtoService.findAll().subscribe({
+      next: (dadosApi) => {
+        // Preenche AMBAS as listas (a mestre e a de exibição)
+        this.produtosTodos = dadosApi;
+        this.produtos = dadosApi;
+        this.isLoading = false;
+        console.log('Produtos carregados:', this.produtos);
+      },
+      error: (erro) => {
+        console.error('Falha ao carregar produtos.', erro);
+        this.isLoading = false;
+      }
+    });
   }
 
+  // ######################################################
+  // ## MÉTODOS DE FILTRAGEM (Padrão Frontend Solicitado) ##
+  // ######################################################
+
+  /**
+   * Filtra a lista mestre (produtosTodos) no FRONTEND
+   * e atualiza a lista 'produtos'.
+   */
   filtrar(): void {
-    this.carregarProdutos();
+    const filtros = this.filtroForm.value;
+    
+    // Começa com a lista mestre completa
+    let listaFiltrada = this.produtosTodos;
+
+    // Aplica o filtro de NOME (se existir)
+    if (filtros.nome) {
+      const nomeFiltro = filtros.nome.toLowerCase();
+      listaFiltrada = listaFiltrada.filter(produto =>
+        produto.nome.toLowerCase().includes(nomeFiltro)
+      );
+    }
+
+    // Aplica o filtro de STATUS (se existir)
+    if (filtros.status) {
+      listaFiltrada = listaFiltrada.filter(produto =>
+        produto.status === filtros.status
+      );
+    }
+
+    // Atualiza a lista que o HTML está exibindo
+    this.produtos = listaFiltrada;
   }
 
+  /**
+   * Limpa os filtros e restaura a lista completa (sem chamar API).
+   */
   limparFiltros(): void {
     this.filtroForm.reset({
-      nome: '',
+      nome: null,
       status: null
     });
-    this.carregarProdutos();
+    // Restaura a lista de exibição para a lista mestre
+    this.produtos = this.produtosTodos;
   }
+
+  // ######################################################
+  // ## MÉTODOS DE NAVEGAÇÃO                          ##
+  // ######################################################
 
   novoProduto(): void {
     this.router.navigateByUrl('/gerenciarProduto');
   }
 
-  editarProduto(id: Number): void {
-    this.router.navigateByUrl('/gerenciarProduto');
+  /**
+   * Navega para a rota de edição com o ID correto.
+   */
+  editarProduto(id: number): void {
+    this.router.navigateByUrl(`/gerenciarProduto/${id}`);
+  }
+
+  editarEstoque(id: number): void {
+    
   }
 }

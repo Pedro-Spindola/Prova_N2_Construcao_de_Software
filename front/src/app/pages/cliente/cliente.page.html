@@ -21,7 +21,7 @@
           <label>
             Tipo:
             <select formControlName="tipo">
-              <option [ngValue]="null">Todos</option>
+              <option [ngValue]="null">TODOS</option>
               <option *ngFor="let tipo of tipoOptions" [value]="tipo">
                 {{ tipo }}
               </option>
@@ -31,7 +31,7 @@
           <label>
             Status:
             <select formControlName="status">
-              <option [ngValue]="null">Todos</option>
+              <option [ngValue]="null">TODOS</option>
               <option *ngFor="let status of statusOptions" [value]="status">
                 {{ status }}
               </option>
@@ -50,11 +50,11 @@
         Carregando clientes...
       </div>
 
-      <div *ngIf="!isLoading && clientes.length === 0" class="status-message">
+      <div *ngIf="!isLoading && clientesFiltrados.length === 0" class="status-message">
         Nenhum cliente encontrado.
       </div>
 
-      <section *ngIf="!isLoading && clientes.length > 0" class="table-container">
+      <section *ngIf="!isLoading && clientesFiltrados.length > 0" class="table-container">
         <table class="tabela-cliente">
           <thead>
             <tr>
@@ -67,7 +67,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let cliente of clientes">
+            <tr *ngFor="let cliente of clientesFiltrados">
               <td>{{ cliente.id }}</td>
               <td>{{ cliente.nome }}</td>
               <td>{{ cliente.tipo }}</td>

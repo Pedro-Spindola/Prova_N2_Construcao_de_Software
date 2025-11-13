@@ -15,10 +15,13 @@ export const routes: Routes = [
     { path: 'login', component: LoginPage},
     { path: 'produto', component: ProdutoPage},
     { path: 'gerenciarProduto', component: GerenciarProdutoPage},
+    { path: 'gerenciarProduto/:id', component: GerenciarProdutoPage},
     { path: 'cliente', component: ClientePage},
     { path: 'gerenciarCliente', component: GerenciarClientePage},
+    { path: 'gerenciarCliente/:id', component: GerenciarClientePage},
     { path: 'funcionario', component: FuncionarioPage},
     { path: 'gerenciarFuncionario', component: GerenciarFuncionarioPage},
+    { path: 'gerenciarFuncionario/:id', component: GerenciarFuncionarioPage},
     { path: 'relatorios', component: RelatoriosPage},
     { path: 'lancamento', component: LancamentoPage}
 ];

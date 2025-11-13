@@ -101,11 +101,6 @@ form {
       background: #fff;
     }
 
-    &:read-only,
-    &:disabled {
-      background-color: #eee;
-      cursor: not-allowed;
-    }
   }
 }
 
