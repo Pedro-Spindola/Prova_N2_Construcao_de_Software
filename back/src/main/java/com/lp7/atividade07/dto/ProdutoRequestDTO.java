@@ -9,7 +9,7 @@ public record ProdutoRequestDTO(
     String nome,
     String descricao,
     Integer quantidadeCaixa,
-    BigDecimal precoCusto,
+    BigDecimal precoCompra,
     BigDecimal precoVenda,
     StatusProduto status
 ) {}

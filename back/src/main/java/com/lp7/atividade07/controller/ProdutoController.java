@@ -34,13 +34,10 @@ public class ProdutoController {
                 return produtoService.cadastrarProduto(produtoRequestDTO);
         }
 
-        @PutMapping
-        public ProdutoResponseDTO atualizarProduto(@RequestBody ProdutoRequestDTO produtoRequestDTO){
-                return produtoService.atualizarProduto(produtoRequestDTO);
+        @PutMapping("/{id}")
+        public ProdutoResponseDTO atualizarProduto(@RequestBody ProdutoRequestDTO produtoRequestDTO, @PathVariable Long id){
+                return produtoService.atualizarProduto(produtoRequestDTO,id);
         }
 
-        @PutMapping("/{id}")
-        public boolean statusProduto(@PathVariable Long id){
-                return produtoService.alterarStatus(id);
-        }
+       
 }

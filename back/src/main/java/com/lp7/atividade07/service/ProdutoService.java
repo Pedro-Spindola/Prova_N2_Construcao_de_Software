@@ -54,7 +54,7 @@ public class ProdutoService {
        if(produtoRequestDTO.precoVenda() == null || produtoRequestDTO.precoVenda().compareTo(BigDecimal.ZERO) <= 0)
            throw new CampoObrigatorioNuloException("preço de venda deve ser maior que zero");
 
-       if(produtoRequestDTO.precoCusto() == null || produtoRequestDTO.precoCusto().compareTo(BigDecimal.ZERO) <= 0)
+       if(produtoRequestDTO.precoCompra() == null || produtoRequestDTO.precoCompra().compareTo(BigDecimal.ZERO) <= 0)
            throw new CampoObrigatorioNuloException("preço de custo deve ser maior que zero");
        if(produtoRequestDTO.quantidadeCaixa() == null || produtoRequestDTO.quantidadeCaixa() < 0)
           throw new CampoObrigatorioNuloException("quantidade em caixa de ser maior ou igual a zero");
@@ -68,9 +68,11 @@ public class ProdutoService {
         return produtoMapper.toResponseDTO(salvo);
     }
 
-    public ProdutoResponseDTO atualizarProduto(ProdutoRequestDTO produtoRequestDTO){
-         if(produtoRequestDTO.id() == null)
+    public ProdutoResponseDTO atualizarProduto(ProdutoRequestDTO produtoRequestDTO, Long id){
+         if(id == null)
         throw new CampoObrigatorioNuloException("id");
+    Produto produtoExistente = produtoRepository.findById(id)
+        .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto com ID " + produtoRequestDTO.id() + " não encontrado."));
     
     if(produtoRequestDTO.nome() == null || produtoRequestDTO.nome().trim().isEmpty())
         throw new CampoObrigatorioNuloException("nome é obrigatorio");
@@ -81,14 +83,15 @@ public class ProdutoService {
     if(produtoRequestDTO.quantidadeCaixa() == null || produtoRequestDTO.quantidadeCaixa() < 0)
         throw new CampoObrigatorioNuloException("quantidade da caixa deve ser maior ou igual a zero");
 
-    if(produtoRequestDTO.precoCusto() == null || produtoRequestDTO.precoCusto().compareTo(BigDecimal.ZERO) <= 0)
+    System.out.println(" Teste " +produtoRequestDTO.precoCompra());
+
+    if(produtoRequestDTO.precoCompra() == null || produtoRequestDTO.precoCompra().compareTo(BigDecimal.ZERO) <= 0)
         throw new CampoObrigatorioNuloException("preço de custo deve ser maior que zero");
 
     if(produtoRequestDTO.precoVenda() == null || produtoRequestDTO.precoVenda().compareTo(BigDecimal.ZERO) <= 0)
         throw new CampoObrigatorioNuloException("preço de venda deve ser maior que zero");
 
-    Produto produtoExistente = produtoRepository.findById(produtoRequestDTO.id())
-            .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto com ID " + produtoRequestDTO.id() + " não encontrado."));
+    
     Estoque estoqueExistente = estoqueRepository.findByProdutoId(produtoExistente.getId())
         .orElseThrow(() -> new ProdutoNaoEncontradoException("Estoque do produto não encontrado."));
     Produto produtoAtualizado = produtoMapper.toEntity(produtoRequestDTO, estoqueExistente);

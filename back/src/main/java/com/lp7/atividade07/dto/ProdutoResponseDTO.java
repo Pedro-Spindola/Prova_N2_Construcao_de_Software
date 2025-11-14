@@ -10,6 +10,7 @@ public record ProdutoResponseDTO(
     String descricao,
     Integer quantidadeCaixa,
     BigDecimal precoVenda,
+    BigDecimal precoCompra,
     StatusProduto status,
     Integer quantidadeEmEstoque
 ) {

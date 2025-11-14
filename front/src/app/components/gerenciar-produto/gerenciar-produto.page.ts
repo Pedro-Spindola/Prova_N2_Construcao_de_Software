@@ -31,8 +31,8 @@ export class GerenciarProdutoPage implements OnInit {
       nome: ['', Validators.required],
       descricao: [''], 
       quantidadeCaixa: [null, [Validators.required, Validators.min(0)]],
-      // Assumindo que seu modelo 'Produto' inclui 'precoCusto'
-      precoCusto: [null, [Validators.required, Validators.min(0)]],
+      // Assumindo que seu modelo 'Produto' inclui 'precoCompra'
+      precoCompra: [null, [Validators.required, Validators.min(0)]],
       precoVenda: [null, [Validators.required, Validators.min(0)]],
       status: [StatusProduto.ATIVO, Validators.required],
       quantidadeEmEstoque: [{ value: null, disabled: true }, [Validators.required, Validators.min(0)]]

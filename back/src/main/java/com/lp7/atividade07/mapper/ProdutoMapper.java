@@ -16,7 +16,7 @@ public class ProdutoMapper {
         produto.setNome(dto.nome());
         produto.setDescricao(dto.descricao());
         produto.setQuantidadeCaixa(dto.quantidadeCaixa());
-        produto.setPrecoCusto(dto.precoCusto());
+        produto.setPrecoCusto(dto.precoCompra());
         produto.setPrecoVenda(dto.precoVenda());
         produto.setStatus(dto.status());
         produto.setEstoque(estoque);
@@ -37,6 +37,7 @@ public class ProdutoMapper {
             produto.getDescricao(),
             produto.getQuantidadeCaixa(),
             produto.getPrecoVenda(),
+            produto.getPrecoCusto(),
             produto.getStatus(),
             estoqueAtual
         );

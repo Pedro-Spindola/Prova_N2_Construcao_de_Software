@@ -46,7 +46,7 @@ public class UsuarioService {
             throw new DadoJaCadastradoException("Esse email já existe.");
 
 
-
+            
         if(dto.senha() == null || dto.senha().trim().isEmpty())
             throw new CampoObrigatorioNuloException("senha é obrigatório ");
         if(dto.senha().length() < 8)

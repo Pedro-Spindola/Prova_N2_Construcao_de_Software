@@ -1,5 +1,6 @@
 package com.lp7.atividade07.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,6 @@ import com.lp7.atividade07.dto.ItemRequestDTO;
 import com.lp7.atividade07.dto.ItemResponseDTO;
 import com.lp7.atividade07.dto.PedidoRequestDTO;
 import com.lp7.atividade07.dto.PedidoResponseDTO;
-import com.lp7.atividade07.dto.PedidoResponseSimplesDTO;
 import com.lp7.atividade07.dto.ProdutoResponseDTO;
 import com.lp7.atividade07.dto.UsuarioResponseDTO;
 import com.lp7.atividade07.exception.CampoObrigatorioNuloException;
@@ -106,6 +106,9 @@ public class PedidoService {
             ));
 
         ItemPedido novoItem = itemMapper.toEntity(i, produto);
+        novoItem.setSubTotal(
+        produto.getPrecoVenda().multiply(BigDecimal.valueOf(i.quantidade())));
+
         novoItem.setPedido(pedido);
         meusItems.add(novoItem);
     }
@@ -182,13 +185,51 @@ public class PedidoService {
     );
 }
 
+public List<PedidoResponseDTO> buscarTodos() {
 
-    public List<PedidoResponseSimplesDTO> buscarTodos(){
-        List<Pedido> pedidos = pedidoRepository.findAll();
-        return pedidos.stream()
-                      .map(pedidoMapper::toResponseSimplesDTO)
-                      .toList();
+    List<Pedido> pedidos = pedidoRepository.findAll();
+
+    List<PedidoResponseDTO> resposta = new ArrayList<>();
+
+    for (Pedido pedido : pedidos) {
+
+        // CLIENTE
+        ClienteResponseDTO clienteResponseDTO =
+                clienteMapper.toResponseDTO(pedido.getCliente());
+
+        // USUÁRIO
+        UsuarioResponseDTO usuarioResponseDTO =
+                usuarioMapper.toResponseDTO(pedido.getUsuario());
+
+        // ITENS
+        List<ItemResponseDTO> itensResponseDTO = new ArrayList<>();
+
+        for (ItemPedido item : pedido.getItensPedido()) {
+
+            ProdutoResponseDTO produtoResponseDTO =
+                    produtoMapper.toResponseDTO(item.getProduto());
+
+            ItemResponseDTO itemResponseDTO =
+                    itemMapper.toResponseDTO(item, produtoResponseDTO);
+
+            itensResponseDTO.add(itemResponseDTO);
+        }
+
+        // MONTA O PEDIDO COMPLETO
+        PedidoResponseDTO pedidoResponseDTO =
+                pedidoMapper.toResponseDTO(
+                        pedido,
+                        clienteResponseDTO,
+                        usuarioResponseDTO,
+                        itensResponseDTO
+                );
+
+        resposta.add(pedidoResponseDTO);
     }
+
+    return resposta;
+}
+    
 }
 
 

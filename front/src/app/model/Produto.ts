@@ -6,6 +6,7 @@ export interface Produto {
     descricao: string,
     quantidadeCaixa: number,
     precoVenda: number,
+    precoCompra: number,
     status: StatusProduto,
     quantidadeEmEstoque: number
 }

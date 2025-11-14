@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lp7.atividade07.dto.PedidoRequestDTO;
 import com.lp7.atividade07.dto.PedidoResponseDTO;
-import com.lp7.atividade07.dto.PedidoResponseSimplesDTO;
 import com.lp7.atividade07.service.PedidoService;
 
 @RestController
@@ -21,12 +20,12 @@ public class PedidoController {
     PedidoService pedidoService;
 
     @GetMapping
-    public List<PedidoResponseSimplesDTO> buscarTodos(){
+    public List<PedidoResponseDTO> buscarTodos(){
         return pedidoService.buscarTodos();
     }
 
     @GetMapping("/{idPedido}")
-    public PedidoResponseSimplesDTO buscarPedidoPorId(@PathVariable Long idPedido){
+    public PedidoResponseDTO buscarPedidoPorId(@PathVariable Long idPedido){
         return pedidoService.buscarPedidoPorId(idPedido);
     }
 

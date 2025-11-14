@@ -152,6 +152,7 @@ export class LancamentoPage implements OnInit {
       itemExistente.valorTotal = itemExistente.quantidade * itemExistente.valorUnitario;
     } else {
       // Adiciona um novo item
+      console.log(produtoSelecionado);
       const novoItem: ItemLancamento = {
         produtoId: produtoSelecionado.id,
         nomeProduto: produtoSelecionado.nome,
