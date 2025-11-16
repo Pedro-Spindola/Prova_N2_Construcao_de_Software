@@ -2,14 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { NavBar } from "../../components/nav-bar/nav-bar";
 import { Produto } from '../../model/Produto';
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { StatusProduto } from '../../model/enums/StatusProduto';
 import { ProdutoService } from '../../services/produto-service';
+import { ModelEstoque } from "../../components/model-estoque/model-estoque";
+import { Estoque } from '../../model/Estoque';
+import { EstoqueService } from '../../services/estoque-service';
 
 @Component({
   selector: 'app-produto',
-  imports: [CommonModule, NavBar, CurrencyPipe, ReactiveFormsModule],
+  imports: [CommonModule, NavBar, CurrencyPipe, ReactiveFormsModule, ModelEstoque],
   templateUrl: './produto.page.html',
   styleUrl: './produto.page.scss',
 })
@@ -20,6 +23,9 @@ export class ProdutoPage implements OnInit {
   // A lista que o HTML exibe (que será filtrada)
   produtos: Produto[] = []; 
   
+  modalAberto = false;
+  produtoSelecionado!: Produto;
+
   isLoading = false;
   filtroForm: FormGroup;
   statusOptions = Object.values(StatusProduto);
@@ -28,7 +34,8 @@ export class ProdutoPage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private produtoService: ProdutoService // <-- Injetado
+    private produtoService: ProdutoService, // <-- Injetado
+    private estoqueService: EstoqueService
   ) {
     this.filtroForm = this.fb.group({
       nome: [null],
@@ -122,7 +129,27 @@ export class ProdutoPage implements OnInit {
     this.router.navigateByUrl(`/gerenciarProduto/${id}`);
   }
 
-  editarEstoque(id: number): void {
+  editarEstoque(produto: Produto): void {
+    this.produtoSelecionado = produto;
+    this.modalAberto = true;
+  }
+
+  atualizarEstoque(novaQuantidade: number) {
+    this.modalAberto = false;
+
+    const estoque: Estoque = {
+      quantidade: novaQuantidade,
+      idProduto: this.produtoSelecionado.id
+    };
+
     
+    this.estoqueService.update(estoque).subscribe({
+      next: () => {
+        this.carregarProdutos();
+      },
+      error: (erro) => {
+        console.error('Falha ao atualizar produto.', erro);
+      }
+    });
   }
 }

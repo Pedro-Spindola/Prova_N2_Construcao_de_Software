@@ -25,11 +25,14 @@ import com.lp7.atividade07.mapper.PedidoMapper;
 import com.lp7.atividade07.mapper.ProdutoMapper;
 import com.lp7.atividade07.mapper.UsuarioMapper;
 import com.lp7.atividade07.model.Cliente;
+import com.lp7.atividade07.model.Estoque;
 import com.lp7.atividade07.model.ItemPedido;
 import com.lp7.atividade07.model.Pedido;
 import com.lp7.atividade07.model.Produto;
 import com.lp7.atividade07.model.Usuario;
+import com.lp7.atividade07.repository.CaixaRepository;
 import com.lp7.atividade07.repository.ClienteRepository;
+import com.lp7.atividade07.repository.EstoqueRepository;
 import com.lp7.atividade07.repository.PedidoRepository;
 import com.lp7.atividade07.repository.ProdutoRepository;
 import com.lp7.atividade07.repository.UsuarioRepository;
@@ -49,6 +52,12 @@ public class PedidoService {
     ProdutoRepository produtoRepository;
 
     @Autowired
+    EstoqueRepository estoqueRepository;
+
+    @Autowired
+    CaixaRepository caixaRepository;
+
+    @Autowired
     PedidoMapper pedidoMapper;
 
     @Autowired
@@ -62,6 +71,9 @@ public class PedidoService {
 
     @Autowired
     ProdutoMapper produtoMapper;
+
+    @Autowired
+    CaixaService caixaService;
     
 
   public PedidoResponseDTO buscarPedidoPorId(Long idPedido) {
@@ -78,63 +90,75 @@ public class PedidoService {
         }) .toList();
         
     return pedidoMapper.toResponseDTO(pedido, clienteResponseDTO, usuarioResponseDTO, itensResponseDTO);
-}
+    }
 
     public PedidoResponseDTO registrarPedido(PedidoRequestDTO dto){
-     Pedido pedido = new Pedido();
-    pedido.setItensPedido(new ArrayList<>());
+        Pedido pedido = new Pedido();
+        pedido.setItensPedido(new ArrayList<>());
 
-    Cliente cliente = clienteRepository.findById(dto.cliente())
-        .orElseThrow(() -> new ClienteNaoEncontradoException(
-            "Cliente com id: " + dto.cliente() + " não encontrado."
-        ));
-
-    Usuario usuario = usuarioRepository.findById(dto.usuario())
-        .orElseThrow(() -> new UsuarioNaoEncontradoException(
-            "Usuário com id: " + dto.usuario() + " não encontrado."
-        ));
-
-    List<ItemPedido> meusItems = new ArrayList<>();
-
-    System.out.println("Tamanho de list pedidoDTO: " + dto.itensComprados().size());
-
-    for(ItemRequestDTO i : dto.itensComprados()){
-
-        Produto produto = produtoRepository.findById(i.idProduto())
-            .orElseThrow(() -> new ProdutoNaoEncontradoException(
-                "Produto com id: " + i.idProduto() + " não encontrado."
+        Cliente cliente = clienteRepository.findById(dto.cliente())
+            .orElseThrow(() -> new ClienteNaoEncontradoException(
+                "Cliente com id: " + dto.cliente() + " não encontrado."
             ));
 
-        ItemPedido novoItem = itemMapper.toEntity(i, produto);
-        novoItem.setSubTotal(
-        produto.getPrecoVenda().multiply(BigDecimal.valueOf(i.quantidade())));
+        Usuario usuario = usuarioRepository.findById(dto.usuario())
+            .orElseThrow(() -> new UsuarioNaoEncontradoException(
+                "Usuário com id: " + dto.usuario() + " não encontrado."
+            ));
 
-        novoItem.setPedido(pedido);
-        meusItems.add(novoItem);
+        List<ItemPedido> meusItems = new ArrayList<>();
+
+        System.out.println("Tamanho de list pedidoDTO: " + dto.itensComprados().size());
+
+        for(ItemRequestDTO i : dto.itensComprados()){
+
+            Produto produto = produtoRepository.findById(i.idProduto())
+                .orElseThrow(() -> new ProdutoNaoEncontradoException(
+                    "Produto com id: " + i.idProduto() + " não encontrado."
+                ));
+
+            ItemPedido novoItem = itemMapper.toEntity(i, produto);
+            novoItem.setSubTotal(
+            produto.getPrecoVenda().multiply(BigDecimal.valueOf(i.quantidade())));
+
+            novoItem.setPedido(pedido);
+            meusItems.add(novoItem);
+
+            Estoque estoque = estoqueRepository.findByProdutoId(produto.getId())
+                .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado para ID: " + produto.getId()));
+
+            var novoEstoque = estoque.getQuantidade();
+            novoEstoque -= novoItem.getQuantidade();
+
+            estoque.setQuantidade(novoEstoque);
+
+            estoqueRepository.save(estoque);
+        }
+
+        pedido = pedidoMapper.toEntity(dto, cliente, usuario, meusItems);
+
+        System.out.println("Tamanho de list pedido: " + pedido.getItensPedido().size());
+        for(ItemPedido i : pedido.getItensPedido()){
+            System.out.println("Testando antes de enviar: " + i.getPedido());
+        }
+
+        caixaService.acrescentarValor(pedido.getUsuario().getId(), pedido.getTotal());
+
+        Pedido salvo = pedidoRepository.save(pedido);
+
+        ClienteResponseDTO clienteResponseDTO = clienteMapper.toResponseDTO(cliente);
+        UsuarioResponseDTO usuarioResponseDTO = usuarioMapper.toResponseDTO(usuario);
+
+        List<ItemResponseDTO> itemsResponseDTOs = new ArrayList<>();
+
+        for(ItemPedido i : salvo.getItensPedido()){
+            ProdutoResponseDTO produtoResponseDTO = produtoMapper.toResponseDTO(i.getProduto());
+            ItemResponseDTO itemResponseDTO = itemMapper.toResponseDTO(i, produtoResponseDTO);
+            itemsResponseDTOs.add(itemResponseDTO);
+        }
+
+        return pedidoMapper.toResponseDTO(salvo, clienteResponseDTO, usuarioResponseDTO, itemsResponseDTOs);
     }
-
-    pedido = pedidoMapper.toEntity(dto, cliente, usuario, meusItems);
-
-    System.out.println("Tamanho de list pedido: " + pedido.getItensPedido().size());
-    for(ItemPedido i : pedido.getItensPedido()){
-        System.out.println("Testando antes de enviar: " + i.getPedido());
-    }
-
-    Pedido salvo = pedidoRepository.save(pedido);
-
-    ClienteResponseDTO clienteResponseDTO = clienteMapper.toResponseDTO(cliente);
-    UsuarioResponseDTO usuarioResponseDTO = usuarioMapper.toResponseDTO(usuario);
-
-    List<ItemResponseDTO> itemsResponseDTOs = new ArrayList<>();
-
-    for(ItemPedido i : salvo.getItensPedido()){
-        ProdutoResponseDTO produtoResponseDTO = produtoMapper.toResponseDTO(i.getProduto());
-        ItemResponseDTO itemResponseDTO = itemMapper.toResponseDTO(i, produtoResponseDTO);
-        itemsResponseDTOs.add(itemResponseDTO);
-    }
-
-    return pedidoMapper.toResponseDTO(salvo, clienteResponseDTO, usuarioResponseDTO, itemsResponseDTOs);
-}
 
     
     public PedidoResponseDTO atualizarPedido(PedidoRequestDTO dto, Long idPedido){

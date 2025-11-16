@@ -11,14 +11,19 @@ import com.lp7.atividade07.dto.UsuarioResponseDTO;
 import com.lp7.atividade07.exception.CampoObrigatorioNuloException;
 import com.lp7.atividade07.exception.DadoJaCadastradoException;
 import com.lp7.atividade07.mapper.UsuarioMapper;
+import com.lp7.atividade07.model.Caixa;
 import com.lp7.atividade07.model.Usuario;
 import com.lp7.atividade07.model.enums.StatusUsuario;
+import com.lp7.atividade07.repository.CaixaRepository;
 import com.lp7.atividade07.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {
     @Autowired
     UsuarioRepository usuarioRepository;
+
+    @Autowired
+    CaixaRepository caixaRepository;
 
     @Autowired
     UsuarioMapper usuarioMapper;
@@ -65,6 +70,10 @@ public class UsuarioService {
 
         Usuario usuario = usuarioMapper.toEntity(dto);
         Usuario salvo = usuarioRepository.save(usuario);
+
+        Caixa caixa = new Caixa();
+        caixaRepository.save(caixa);
+
         return usuarioMapper.toResponseDTO(salvo);
     }
 

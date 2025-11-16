@@ -68,7 +68,7 @@
                 <button class="btn btn-secondary btn-sm" (click)="editarProduto(produto.id)">
                   Editar
                 </button>
-                <button class="btn btn-primary btn-sm" (click)="editarEstoque(produto.id)">
+                <button class="btn btn-primary btn-sm" (click)="editarEstoque(produto)">
                   Estoque
                 </button>
               </td>
@@ -79,3 +79,10 @@
     </div>
   </div>
 </section>
+
+<app-model-estoque
+  [produto]="produtoSelecionado"
+  [aberto]="modalAberto"
+  (fechar)="modalAberto = false"
+  (salvar)="atualizarEstoque($event)">
+</app-model-estoque>

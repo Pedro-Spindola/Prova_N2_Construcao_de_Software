@@ -28,4 +28,8 @@ public class Caixa {
     public void setCarteira(BigDecimal carteira) {
         this.carteira = carteira;
     }
+
+    public void acrescentarCaixa(BigDecimal valor){
+        this.carteira = this.carteira.add(valor);
+    }
 }

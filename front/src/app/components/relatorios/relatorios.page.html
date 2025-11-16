@@ -17,16 +17,6 @@
             <input type="text" formControlName="cliente" placeholder="Nome do cliente" />
           </label>
 
-          <label>
-            Data Início:
-            <input type="date" formControlName="dataInicio" />
-          </label>
-
-          <label>
-            Data Fim:
-            <input type="date" formControlName="dataFim" />
-          </label>
-
           <div class="filtro-botoes">
             <button type="submit" class="btn btn-success">Filtrar</button>
             <button type="button" class="btn btn-secondary" (click)="limparFiltros()">Limpar</button>
@@ -51,7 +41,6 @@
               <th>ID Pedido</th>
               <th>Funcionário</th>
               <th>Cliente</th>
-              <th>Data Pedido</th>
               <th>Valor Total</th>
             </tr>
           </thead>
@@ -68,7 +57,6 @@
               <td>{{ pedido.id }}</td>
               <td>{{ pedido.usuario.nome }}</td> <!-- DTO: usuario.nome -->
               <td>{{ pedido.cliente.nome }}</td> <!-- DTO: cliente.nome -->
-              <td>{{ pedido.data | date: 'dd/MM/yyyy' }}</td> <!-- DTO: data -->
               <td>{{ pedido.total | currency: 'BRL' }}</td> <!-- DTO: total -->
             </tr>
 

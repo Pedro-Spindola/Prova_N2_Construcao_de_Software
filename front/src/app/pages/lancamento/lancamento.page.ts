@@ -96,7 +96,6 @@ export class LancamentoPage implements OnInit {
       error: (err) => {
         console.error('Erro ao carregar dados iniciais', err);
         this.isLoading = false;
-        alert('Falha ao carregar dados. Tente novamente.');
       }
     });
   }
@@ -145,7 +144,6 @@ export class LancamentoPage implements OnInit {
       // Apenas atualiza a quantidade (respeitando o estoque)
       const novaQtde = itemExistente.quantidade + quantidade;
       if (novaQtde > itemExistente.estoqueDisponivel) {
-        alert(`Estoque insuficiente. Você já tem ${itemExistente.quantidade} e tentou adicionar ${quantidade}. Limite: ${itemExistente.estoqueDisponivel}`);
         return;
       }
       itemExistente.quantidade = novaQtde;
@@ -214,11 +212,9 @@ export class LancamentoPage implements OnInit {
     // 1. Validações
     if (this.cabecalhoForm.invalid) {
       this.cabecalhoForm.markAllAsTouched();
-      alert('Por favor, selecione o Cliente e o Funcionário.');
       return;
     }
     if (this.itensDoPedido.length === 0) {
-      alert('Adicione pelo menos um item ao pedido.');
       return;
     }
 
@@ -249,13 +245,11 @@ export class LancamentoPage implements OnInit {
     this.pedidoService.create(pedidoParaAPI as any).subscribe({
       next: (respostaApi) => {
         console.log('API respondeu:', respostaApi);
-        alert('Lançamento salvo com sucesso!');
         // Limpa tudo e navega para outra página
         this.router.navigateByUrl('/'); // (ou para uma lista de pedidos)
       },
       error: (err) => {
         console.error('Erro ao salvar pedido:', err);
-        alert('Falha ao salvar o lançamento. Verifique o console.');
       }
     });
   }

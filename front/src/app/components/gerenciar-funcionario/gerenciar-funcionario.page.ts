@@ -93,7 +93,6 @@ export class GerenciarFuncionarioPage {
       },
       error: (erro) => {
         console.error('Falha ao carregar os dados do cunfionario.', erro);
-        alert('Erro ao carregar funcionario. Tente novamente.');
         this.voltar();
       }
     });
@@ -123,20 +122,15 @@ export class GerenciarFuncionarioPage {
         if(this.funcionarioId != null){
           console.log('Salvando (Update):', formData);
           this.funcionarioService.update(formData, this.funcionarioId).subscribe(() => {
-            alert('Funcionário atualizado com sucesso!');
             this.router.navigate(['funcionarios']); // Navega de volta
           });
         }
     } else {
       console.log('Salvando (Create):', formData);
         this.funcionarioService.create(formData).subscribe(() => {
-          alert('Funcionário criado com sucesso!');
           this.router.navigate(['funcionarios']); // Navega de volta
         });
     }
-    
-    // Simulação de navegação após salvar
-    alert('Salvo com sucesso! (Simulação)');
     this.router.navigate(['funcionario']); // Rota da sua listagem
   }
 

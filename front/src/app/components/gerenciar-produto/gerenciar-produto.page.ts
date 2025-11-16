@@ -65,7 +65,6 @@ export class GerenciarProdutoPage implements OnInit {
       },
       error: (erro) => {
         console.error('Falha ao carregar produto.', erro);
-        alert('Erro ao carregar o produto. Voltando para a lista.');
         this.voltar();
       }
     });
@@ -91,12 +90,10 @@ export class GerenciarProdutoPage implements OnInit {
       // Chama o serviço de atualização
       this.produtoService.update(produtoData, this.produtoId!).subscribe({
         next: () => {
-          alert('Produto atualizado com sucesso!');
           this.voltar();
         },
         error: (erro) => {
           console.error('Falha ao atualizar produto.', erro);
-          alert('Erro ao atualizar produto.');
         }
       });
 
@@ -106,12 +103,11 @@ export class GerenciarProdutoPage implements OnInit {
       // Chama o serviço de criação
       this.produtoService.create(produtoData).subscribe({
         next: () => {
-          alert('Produto criado com sucesso!');
           this.voltar();
         },
         error: (erro) => {
           console.error('Falha ao criar produto.', erro);
-          alert('Erro ao criar produto.');
+
         }
       });
     }

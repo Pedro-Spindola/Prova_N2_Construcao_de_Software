@@ -125,7 +125,6 @@ export class GerenciarClientePage implements OnInit {
       },
       error: (erro) => {
         console.error('Falha ao carregar os dados do cliente.', erro);
-        alert('Erro ao carregar cliente. Tente novamente.');
         this.voltar();
       }
     });
@@ -148,14 +147,12 @@ export class GerenciarClientePage implements OnInit {
       if(this.clienteId != null){
         console.log('Salvando (Update):', clienteData);
         this.clienteService.update(clienteData, this.clienteId).subscribe(() => {
-          alert('Cliente atualizado com sucesso!');
           this.voltar();
         });
       }
     } else {
       console.log('Salvando (Create):', clienteData);
       this.clienteService.create(clienteData).subscribe(() => {
-        alert('Cliente criado com sucesso!');
         this.voltar();
       });
     }

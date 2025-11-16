@@ -22,15 +22,9 @@ public class EstoqueController {
     @GetMapping("/produto/{idProduto}")
     public EstoqueResponseDTO buscarEstoquePorIdProduto(@PathVariable Long idProduto){
         return estoqueService.buscarEstoquePorIdProduto(idProduto);
-}
+    }
     @PutMapping("/atualizar")
     public EstoqueResponseDTO atualizarEstoqueProdutoDTO(@RequestBody EstoqueRequestDTO dto){
         return estoqueService.atualizarEstoqueProduto(dto);
     }
-
-
-
-
-
-
 }
