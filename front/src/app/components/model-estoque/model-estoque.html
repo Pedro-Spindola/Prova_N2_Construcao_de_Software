@@ -1,0 +1,23 @@
+<div class="modal-overlay" *ngIf="aberto">
+  <div class="modal">
+
+    <h2>Alterar Estoque</h2>
+
+    <p><strong>Produto:</strong> {{ produto.nome }}</p>
+
+    <label for="estoque">Quantidade em estoque:</label>
+    <input
+      id="estoque"
+      type="number"
+      [(ngModel)]="novaQuantidade"
+      min="0"
+    />
+
+    <div class="actions">
+      <button (click)="fechar.emit()">Cancelar</button>
+      <button class="confirm" (click)="onSalvar()">Salvar</button>
+    </div>
+
+  </div>
+</div>
+    
