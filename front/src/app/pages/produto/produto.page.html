@@ -1,0 +1,88 @@
+<app-nav-bar></app-nav-bar>
+
+<section>
+  <div class="container">
+    <h1>Gerenciamento Produto</h1>
+    <div class="box-tabela">
+
+      <form class="filtro-form" [formGroup]="filtroForm" (ngSubmit)="filtrar()">
+        <div class="filtro-campos">
+          <label>
+            Nome Produto:
+            <input type="text" formControlName="nome" placeholder="Ex: Nome" />
+          </label>
+          <label>
+            Status:
+            <select formControlName="status">
+              <option [ngValue]="null">Todos</option>
+              <option *ngFor="let status of statusOptions" [value]="status">
+                {{ status }}
+              </option>
+            </select>
+          </label>
+
+          <button type="submit" class="btn btn-success">Filtrar</button>
+          <button type="button" class="btn btn-secondary" (click)="limparFiltros()">Limpar</button>
+          <button type="button" class="btn btn-primary" (click)="novoProduto()">Novo Produto</button>
+        </div>
+      </form>
+
+      <div *ngIf="isLoading" class="status-message">
+        Carregando produtos...
+      </div>
+
+      <div *ngIf="!isLoading && produtos.length === 0" class="status-message">
+        Nenhum produto encontrado.
+      </div>
+
+      <section *ngIf="!isLoading && produtos.length > 0" class="table-container">
+        <table class="tabela-produto">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Nome</th>
+              <th>Preço Venda</th>
+              <th>Qnt. Estoque</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let produto of produtos">
+              <td>{{ produto.id }}</td>
+              <td>{{ produto.nome }}</td>
+              <td>{{ produto.precoVenda | currency : 'BRL' }}</td>
+              <td>{{ produto.quantidadeEmEstoque }}</td>
+              <td>
+                <span
+                  class="status-badge"
+                  [ngClass]="{
+                    'status-ativo': produto.status === statusProduto.ATIVO,
+                    'status-inativo': produto.status === statusProduto.INATIVO
+                  }"
+                >
+                  {{ produto.status }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-secondary btn-sm" (click)="editarProduto(produto.id)">
+                  Editar
+                </button>
+                <button class="btn btn-primary btn-sm" (click)="editarEstoque(produto)">
+                  Estoque
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </div>
+</section>
+
+<app-model-estoque
+  [produto]="produtoSelecionado"
+  [aberto]="modalAberto"
+  (fechar)="modalAberto = false"
+  (salvar)="atualizarEstoque($event)">
+</app-model-estoque>

@@ -1,0 +1,227 @@
+@use '../../../styles/cor_modelo.scss' as *;
+
+// Estilo geral do container
+section {
+  width: 100%;
+  padding: 32px 0;
+}
+
+.container {
+  width: 95%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+}
+
+h1 {
+  color: $azul-escuro-roxo;
+  margin-bottom: 32px;
+  font-weight: 700;
+  border-bottom: 2px solid $roxo-claro-background;
+  padding-bottom: 16px;
+}
+
+.box-tabela {
+  width: 100%;
+}
+
+// Estilo do Formulário de Filtro
+.filtro-form {
+  margin-bottom: 40px;
+}
+
+.filtro-campos {
+  display: flex;
+  flex-wrap: wrap; 
+  gap: 24px; 
+  align-items: flex-end; 
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+    font-weight: 600;
+    color: $azul-escuro-roxo;
+    flex-grow: 1; 
+  }
+
+  input[type="text"],
+  input[type="date"], // Adicionado tipo 'date'
+  select {
+    padding: 12px 16px; 
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px; 
+    min-width: 200px; 
+    background: $roxo-claro-background;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+
+    &:focus {
+      border-color: $azul-medio;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba($azul-claro-ciano, 0.3);
+      background: #fff;
+    }
+  }
+}
+
+.filtro-botoes {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+// Estilos Padrão de Botões
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &.btn-success {
+    background-color: $verde-principal;
+    color: $azul-escuro-roxo;
+  }
+  &.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+}
+
+// Mensagens de Status (Loading / Vazio)
+.status-message {
+  text-align: center;
+  padding: 48px;
+  font-size: 19px;
+  font-weight: 500;
+  color: #555;
+  background: $roxo-claro-background;
+  border-radius: 4px;
+}
+
+// Container da Tabela
+.table-container {
+  width: 100%;
+  overflow-x: auto; 
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+// --- ESTILOS DA TABELA EXPANSÍVEL ---
+
+// Tabela Principal
+.tabela-relatorio { 
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background-color: $azul-escuro-roxo;
+    color: white;
+  }
+
+  th, td {
+    padding: 16px; 
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  
+  th.col-toggle {
+    width: 40px;
+  }
+  td.col-toggle {
+    width: 40px;
+    text-align: center;
+  }
+
+  // Linha principal do pedido (clicável)
+  .pedido-row {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: $roxo-claro-background;
+    }
+  }
+
+  // Ícone de '+' e '-'
+  .toggle-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 18px;
+    color: $azul-medio;
+    user-select: none; // Impede que o texto seja selecionado
+  }
+
+  // Linha que contém os subitens
+  .subitens-container-row {
+    // Removemos a borda padrão
+    td {
+      border-bottom: none;
+    }
+  }
+
+  // Célula que se expande
+  .subitens-cell {
+    padding: 0 !important; // Remove padding da célula <td>
+    // Um fundo levemente diferente para destacar
+    background: #faf8ff; 
+  }
+}
+
+// Wrapper interno para dar padding e borda
+.subitens-wrapper {
+  padding: 24px;
+  // Borda superior para separar visualmente do pedido principal
+  border-top: 2px solid $azul-medio;
+  
+  h4 {
+    margin: 0 0 16px 0;
+    color: $azul-escuro-roxo;
+    font-size: 16px;
+  }
+}
+
+// Tabela interna (Subitens)
+.tabela-subitens {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: #fff;
+  border: 1px solid #eee;
+  
+  th {
+    background-color: $roxo-claro-background;
+    color: $azul-escuro-roxo;
+    font-weight: 600;
+    padding: 12px;
+    border-bottom: 2px solid #ddd;
+  }
+  
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}

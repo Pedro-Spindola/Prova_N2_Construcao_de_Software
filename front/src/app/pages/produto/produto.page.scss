@@ -1,0 +1,194 @@
+@use '../../../styles/cor_modelo.scss' as *;
+
+// Estilo geral do container
+section {
+  width: 100%;
+  padding: 32px 0; // 2rem
+}
+
+.container {
+  width: 95%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px; // 2rem
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+}
+
+h1 {
+  color: $azul-escuro-roxo;
+  margin-bottom: 32px; // 2rem
+  font-weight: 700;
+  border-bottom: 2px solid $roxo-claro-background;
+  padding-bottom: 16px; // 1rem
+}
+
+.box-tabela {
+  width: 100%;
+}
+
+// Estilo do Formulário de Filtro
+.filtro-form {
+  margin-bottom: 40px; // 2.5rem
+}
+
+.filtro-campos {
+  display: flex;
+  flex-wrap: wrap; // Permite que os itens quebrem a linha em telas menores
+  gap: 24px; // 1.5rem
+  align-items: flex-end; // Alinha os botões com os inputs
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; // 0.5rem
+    font-weight: 600;
+    color: $azul-escuro-roxo;
+    flex-grow: 1; // Faz com que os inputs cresçam
+  }
+
+  input[type="text"],
+  select {
+    padding: 12px 16px; // 0.75rem 1rem
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px; // 1rem
+    min-width: 220px;
+    background: $roxo-claro-background;
+    transition: all 0.2s ease;
+
+    &:focus {
+      border-color: $azul-medio;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba($azul-claro-ciano, 0.3);
+      background: #fff;
+    }
+  }
+
+  // Espaçamento para os botões no final
+  button {
+    margin-top: 16px; // 1rem (Adiciona espaço em telas pequenas quando quebrar a linha)
+  }
+}
+
+// Estilos Padrão de Botões
+.btn {
+  padding: 12px 24px; // 0.75rem 1.5rem
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 14px; // 0.875rem
+  transition: all 0.2s ease;
+  white-space: nowrap; // Evita que o texto do botão quebre
+
+  &:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &.btn-success {
+    background-color: $verde-principal;
+    color: $azul-escuro-roxo;
+  }
+  &.btn-secondary {
+    background-color: #6c757d; // Cor padrão p/ secundário
+    color: white;
+  }
+  &.btn-primary {
+    background-color: $azul-medio;
+    color: white;
+  }
+
+  // Botões pequenos para Ações na tabela
+  &.btn-sm {
+    padding: 6px 6px; // 0.4rem 0.8rem
+    font-size: 13px; // 0.8rem
+  }
+}
+
+// Mensagens de Status (Loading / Vazio)
+.status-message {
+  text-align: center;
+  padding: 48px; // 3rem
+  font-size: 19px; // 1.2rem
+  font-weight: 500;
+  color: #555;
+  background: $roxo-claro-background;
+  border-radius: 4px;
+}
+
+// Container da Tabela (para overflow)
+.table-container {
+  width: 100%;
+  overflow-x: auto; // Adiciona scroll horizontal em telas pequenas
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+// Tabela de Produtos
+.tabela-produto {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background-color: $azul-escuro-roxo;
+    color: white;
+
+    th {
+      padding: 16px; // 1rem
+      text-align: left;
+      text-transform: uppercase;
+      font-size: 14px; // 0.875rem
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #eee;
+      transition: background-color 0.15s ease;
+
+      &:nth-child(even) {
+        background-color: $roxo-claro-background;
+      }
+
+      &:hover {
+        background-color: #e6e0f0; // Um roxo um pouco mais escuro
+      }
+    }
+
+    td {
+      padding: 16px; // 1rem
+      vertical-align: middle;
+
+      // Célula das Ações
+      &:last-child {
+        display: flex;
+        gap: 8px; // 0.5rem
+      }
+    }
+  }
+}
+
+// Badges de Status (ATIVO / INATIVO)
+.status-badge {
+  padding: 5px 12px; // 0.3rem 0.75rem
+  border-radius: 12px;
+  font-size: 13px; // 0.8rem
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+
+  &.status-ativo {
+    background-color: $verde-principal;
+    color: $azul-escuro-roxo;
+  }
+
+  &.status-inativo {
+    background-color: #aaa;
+    color: #fff;
+  }
+}

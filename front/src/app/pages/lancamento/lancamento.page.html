@@ -1,0 +1,131 @@
+<form class="lancamento-container" (keydown.enter)="$event.preventDefault()">
+
+  <header class="header">
+    <img src="logo.png" alt="logo" class="logo" />
+    <h1>Novo Lançamento (Pedido)</h1>
+    <button type="button" class="btn-voltar" (click)="voltar()">Voltar</button>
+    </header>
+
+  <main class="main-content">
+    
+    <section class="form-section">
+      <h2 class="section-title">1. Dados do Pedido</h2>
+      <div [formGroup]="cabecalhoForm" class="form-row">
+        
+        <div class="form-group">
+          <label for="clienteId">Cliente:</label>
+          <select id="clienteId" formControlName="clienteId">
+            <option [ngValue]="null" disabled>Selecione um cliente...</option>
+            <option *ngFor="let c of clientesLista" [value]="c.id">{{ c.nome }}</option>
+          </select>
+          <div *ngIf="fCabecalho['clienteId'].invalid && fCabecalho['clienteId'].touched" class="error-message">
+            Cliente é obrigatório.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="funcionarioId">Funcionário (Vendedor):</label>
+          <select id="funcionarioId" formControlName="funcionarioId">
+            <option [ngValue]="null" disabled>Selecione um funcionário...</option>
+            <option *ngFor="let f of funcionariosLista" [value]="f.id">{{ f.nome }}</option>
+          </select>
+          <div *ngIf="fCabecalho['funcionarioId'].invalid && fCabecalho['funcionarioId'].touched" class="error-message">
+            Funcionário é obrigatório.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="form-section" [formGroup]="addItemForm">
+      <h2 class="section-title">2. Adicionar Produtos</h2>
+      <div class="form-row add-item-row">
+        
+        <div class="form-group fg-produto">
+          <label for="produto">Produto:</label>
+          <select id="produto" formControlName="produto">
+            <option [ngValue]="null" disabled>Selecione um produto...</option>
+            <option *ngFor="let p of produtosLista" [ngValue]="p">
+              {{ p.nome }} (Estoque: {{ p.quantidadeEmEstoque }})
+            </option>
+          </select>
+          <div *ngIf="fAddItem['produto'].invalid && fAddItem['produto'].touched" class="error-message">
+            Produto é obrigatório.
+          </div>
+        </div>
+
+        <div class="form-group fg-quantidade">
+          <label for="quantidade">Quantidade:</label>
+          <input id="quantidade" type="number" formControlName="quantidade" />
+          <div *ngIf="fAddItem['quantidade'].invalid && fAddItem['quantidade'].touched" class="error-message">
+            <span *ngIf="fAddItem['quantidade'].errors?.['required']">Obrigatório.</span>
+            <span *ngIf="fAddItem['quantidade'].errors?.['min']">Mínimo 1.</span>
+            <span *ngIf="fAddItem['quantidade'].errors?.['max']">
+              Estoque insuficiente (Max: {{ addItemForm.get('produto')?.value?.quantidadeEmEstoque }}).
+            </span>
+          </div>
+        </div>
+        
+        <div class="form-group fg-botao">
+          <button type="button" class="btn btn-adicionar" 
+                  [disabled]="addItemForm.invalid" 
+                  (click)="adicionarItem()">
+            Adicionar
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2 class="section-title">3. Itens do Pedido</h2>
+      
+      <div *ngIf="itensDoPedido.length === 0" class="status-message">
+        Nenhum item adicionado ao pedido.
+      </div>
+
+      <div *ngIf="itensDoPedido.length > 0" class="table-container">
+        <table class="itens-table">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Quantidade</th>
+              <th>Valor Unit.</th>
+              <th>Valor Total</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of itensDoPedido; let i = index">
+              <td>{{ item.nomeProduto }} (ID: {{ item.produtoId }})</td>
+              <td>{{ item.quantidade }}</td>
+              <td>{{ item.valorUnitario | currency: 'BRL' }}</td>
+              <td>{{ item.valorTotal | currency: 'BRL' }}</td>
+              <td>
+                <button type="button" class="btn btn-remover" (click)="removerItem(i)">
+                  Remover
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="form-footer">
+      <div class="resumo-total">
+        <span>Valor Total do Pedido:</span>
+        <strong class="total-valor">
+          {{ totalGeralPedido | currency: 'BRL' }}
+        </strong>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" class="btn btn-salvar" (click)="onSubmit()">
+          Salvar Lançamento
+        </button>
+      </div>
+    </footer>
+
+  </main>
+</form>

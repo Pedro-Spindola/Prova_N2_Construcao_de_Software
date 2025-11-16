@@ -1,0 +1,98 @@
+<app-nav-bar />
+
+<section>
+  <div class="container">
+    <h1>Relatório de Pedidos</h1>
+    <div class="box-tabela">
+      <!-- Formulário de Filtro -->
+      <form class="filtro-form" [formGroup]="filtroForm" (ngSubmit)="filtrar()">
+        <div class="filtro-campos">
+          <label>
+            Funcionário:
+            <input type="text" formControlName="funcionario" placeholder="Nome do funcionário" />
+          </label>
+
+          <label>
+            Cliente:
+            <input type="text" formControlName="cliente" placeholder="Nome do cliente" />
+          </label>
+
+          <div class="filtro-botoes">
+            <button type="submit" class="btn btn-success">Filtrar</button>
+            <button type="button" class="btn btn-secondary" (click)="limparFiltros()">Limpar</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Mensagens de Status -->
+      <div *ngIf="isLoading" class="status-message">
+        Carregando relatório...
+      </div>
+      <div *ngIf="!isLoading && pedidos.length === 0" class="status-message">
+        Nenhum pedido encontrado para os filtros selecionados.
+      </div>
+
+      <!-- Tabela Principal de Pedidos -->
+      <section *ngIf="!isLoading && pedidos.length > 0" class="table-container">
+        <table class="tabela-relatorio">
+          <thead>
+            <tr>
+              <th class="col-toggle"></th>
+              <th>ID Pedido</th>
+              <th>Funcionário</th>
+              <th>Cliente</th>
+              <th>Valor Total</th>
+            </tr>
+          </thead>
+
+          <tbody *ngFor="let pedido of pedidos" class="pedido-group">
+            <!-- Linha 1: Dados do Pedido (Clicável) -->
+            <!-- CORRIGIDO para usar os DTOs -->
+            <tr class="pedido-row" (click)="toggleSubitens(pedido.id)">
+              <td class="col-toggle">
+                <span class="toggle-icon">
+                  {{ expandedPedidoId === pedido.id ? '−' : '+' }}
+                </span>
+              </td>
+              <td>{{ pedido.id }}</td>
+              <td>{{ pedido.usuario.nome }}</td> <!-- DTO: usuario.nome -->
+              <td>{{ pedido.cliente.nome }}</td> <!-- DTO: cliente.nome -->
+              <td>{{ pedido.total | currency: 'BRL' }}</td> <!-- DTO: total -->
+            </tr>
+
+            <!-- Linha 2: Sub-itens (Aparece/Desaparece) -->
+            <!-- CORRIGIDO para usar os DTOs -->
+            <tr class="subitens-container-row" *ngIf="expandedPedidoId === pedido.id">
+              <td></td> 
+              <td [colSpan]="5" class="subitens-cell">
+                <div class="subitens-wrapper">
+                  <h4>Itens do Pedido #{{ pedido.id }}</h4>
+                  
+                  <table class="tabela-subitens">
+                    <thead>
+                      <tr>
+                        <th>Produto</th>
+                        <th>Quantidade</th>
+                        <th>Valor Uni.</th>
+                        <th>Valor Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- DTO: pedido.itensComprados -->
+                      <tr *ngFor="let item of pedido.itensComprados">
+                        <td>{{ item.produto.nome }}</td> <!-- DTO: item.produto.nome -->
+                        <td>{{ item.quantidade }}</td> <!-- DTO: item.quantidade -->
+                        <td>{{ item.produto.precoVenda | currency: 'BRL' }}</td> <!-- DTO: item.produto.precoVenda -->
+                        <td>{{ item.subTotal | currency: 'BRL' }}</td> <!-- DTO: item.subTotal -->
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </div>
+</section>
