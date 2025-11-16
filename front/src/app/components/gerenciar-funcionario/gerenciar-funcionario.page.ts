@@ -59,7 +59,7 @@ export class GerenciarFuncionarioPage {
       this.isEditing = false;
       
       // Senha é obrigatória na criação
-      this.funcionarioForm.get('senha')?.setValidators([Validators.required, Validators.minLength(6)]);
+      this.funcionarioForm.get('senha')?.setValidators([Validators.required, Validators.minLength(8)]);
       this.funcionarioForm.get('confirmarSenha')?.setValidators([Validators.required]);
     }
 
